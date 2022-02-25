@@ -1,6 +1,17 @@
 import { Fragment } from 'react'
 import { MdClose } from 'react-icons/md'
 import { Dialog, Transition } from '@headlessui/react'
+import Card from '../Card'
+
+interface CloseModalButtonProps {
+  onClick: () => void
+}
+
+const CloseModalButton = ({ onClick }: CloseModalButtonProps) => (
+  <button onClick={onClick}>
+    <MdClose className="h-6 w-6 text-gray-700 dark:text-gray-50" aria-hidden="true" />
+  </button>
+)
 
 export interface ModalProps {
   children: React.ReactNode
@@ -38,22 +49,13 @@ const Modal = ({ children, title, open = false, onClose }: ModalProps) => {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className='inline-block align-bottom bg-white dark:bg-gray-700 rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full'>
-              <div className="bg-white dark:bg-gray-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="w-full">
-                    <Dialog.Title as="h3" className="flex items-center justify-between leading-6 ">
-                      <label className='font-semibold text-lg text-gray-700 dark:text-gray-50'>{title}</label>
-                      <button onClick={onClose}>
-                        <MdClose className="h-6 w-6 text-gray-700 dark:text-gray-50" aria-hidden="true" />
-                      </button>
-                    </Dialog.Title>
-                    <div className="py-4 w-full text-gray-700 dark:text-gray-50">
-                      {children}
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className='inline-block align-bottom overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full'>
+              <Card
+                title={title}
+                action={<CloseModalButton onClick={onClose} />}
+              >
+                {children}
+              </Card>
             </div>
           </Transition.Child>
         </div>
