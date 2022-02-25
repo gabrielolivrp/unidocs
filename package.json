@@ -1,0 +1,30 @@
+{
+  "name": "unidocs",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "web:lint": "yarn workspace @unidocs/web lint",
+    "web:dev": "yarn workspace @unidocs/web start",
+    "core:lint": "yarn workspace @unidocs/core lint",
+    "core:chain": "yarn workspace @unidocs/core chain",
+    "core:compile": "yarn workspace @unidocs/core compile",
+    "core:deploy": "yarn workspace @unidocs/core deploy",
+    "postinstall": "husky install",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "packages/web/src/**/*.{js,ts,tsx}": "yarn eslint --fix",
+    "packages/core/**/*.{js,ts}": "yarn eslint --fix"
+  },
+  "devDependencies": {
+    "@types/node": "^16.7.1",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.3.5"
+  }
+}
