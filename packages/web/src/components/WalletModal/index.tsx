@@ -37,18 +37,9 @@ const WalletModal = ({ show, onClose }: WalletModalProps) => {
       setPendding(true)
 
       activate(connector, undefined, true)
-        .then(() => {
-          console.log('conectado')
-          onClose()
-        })
-        .catch((err) => {
-          console.log('error', err)
-          setHasError(true)
-        })
-        .finally(() => {
-          console.log('finallll')
-          setPendding(false)
-        })
+        .then(() => onClose())
+        .catch(() => setHasError(true))
+        .finally(() => setPendding(false))
     }
   }
 
