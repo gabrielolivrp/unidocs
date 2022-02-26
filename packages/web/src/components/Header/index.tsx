@@ -57,13 +57,17 @@ const AccountButton = () => {
   const balance = useBalance()
 
   return (
-    <div className="pl-4 text-lg font-semibold rounded-full shadow-lg bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-50">
-      <label>{formatEther(balance)} ETH</label>
-      <button
-        onClick={handleOpen}
-        className="text-lg font-semibold px-4 py-2 ml-4 rounded-full text-gray-50 bg-primary">
-        {formatAddress(account!)}
-      </button>
+    <div className="text-sm md:text-lg font-semibold">
+      <div className="flex items-center bg-gray-50 dark:bg-gray-800 shadow-lg rounded-full">
+        <div className="dark:text-gray-50 text-gray-700 pl-2 md:pl-4 pr-1">
+          {formatEther(balance)} ETH
+        </div>
+        <button
+          className="font-semibold px-2 md:px-4 py-3 md:py-2 rounded-full text-gray-50 bg-primary"
+          onClick={handleOpen}>
+          {formatAddress(account!)}
+        </button>
+      </div>
       <AccountModal open={isOpen} onClose={handleClose} />
     </div>
   )
