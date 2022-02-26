@@ -5,7 +5,6 @@ export interface WalletInfo {
   connector?: AbstractConnector
   name: string
   iconURL: string
-  href?: string
 }
 
 export const SUPPORTED_WALLETS: {
