@@ -13,18 +13,18 @@ export interface ThemeContextData {
   toggleTheme: () => void
 }
 
-export interface ThemeProviderProps {
-  children: React.ReactNode
-}
-
-export const ThemeContextDefaultValues: ThemeContextData = {
+export const themeContextDefaultValues: ThemeContextData = {
   theme: Theme.LIGHT,
   toggleTheme: () => { }
 }
 
 export const ThemeContext = createContext<ThemeContextData>(
-  ThemeContextDefaultValues
+  themeContextDefaultValues
 )
+
+export interface ThemeProviderProps {
+  children: React.ReactNode
+}
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [themeFromLocalStorage, setThemeInLocalStorage] =
