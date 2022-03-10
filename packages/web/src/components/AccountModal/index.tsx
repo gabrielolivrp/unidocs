@@ -9,6 +9,7 @@ import Tabs, {
   TabPanels,
   TabPanel
 } from './../../components/Tabs'
+import { useDApp } from '../../contexts'
 
 export interface AccountModalProps {
   open: boolean,
@@ -16,7 +17,8 @@ export interface AccountModalProps {
 }
 
 const AccountModal = ({ onClose, open }: AccountModalProps) => {
-  const { account } = useWeb3React()
+  const { wallet, account } = useDApp()
+
   return (
     <Modal onClose={onClose} open={open} title="Account">
       <Tabs>
@@ -30,7 +32,7 @@ const AccountModal = ({ onClose, open }: AccountModalProps) => {
         </TabItems>
         <TabPanels>
           <TabPanel>
-            <p className="font-semibold text-md">Connected with MetaMask</p>
+            <p className="font-semibold text-md">Connected with {wallet.name}</p>
             <h5 className="font-semibold text-md">{formatAddress(account!)}</h5>
             <div className="flex justify-between">
               <a

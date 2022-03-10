@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { useDApp } from '../../contexts'
 import { MdOutlineDataUsage } from 'react-icons/md'
 import { SUPPORTED_WALLETS, WalletInfo } from './../../constants/wallets'
 import Modal from './../../components/Modal'
@@ -27,38 +28,38 @@ export interface WalletModalProps {
 }
 
 const WalletModal = ({ show, onClose }: WalletModalProps) => {
+  const { wallet, setWallet } = useDApp()
   const { activate } = useWeb3React()
   const [hasError, setHasError] = useState(false)
-  const [wallet, setWallet] = useState<WalletInfo | null>(null)
   const [pendding, setPendding] = useState(false)
 
-  const tryActivation = async (connector: AbstractConnector | undefined) => {
-    if (connector) {
-      setPendding(true)
+  const tryActivation = async (connector: AbstractConnector) => {
+    setPendding(true)
 
-      activate(connector, undefined, true)
-        .then(() => onClose())
-        .catch(() => setHasError(true))
-        .finally(() => setPendding(false))
-    }
+    activate(connector, undefined, true)
+      .then(() => onClose())
+      .catch(() => setHasError(true))
+      .finally(() => setPendding(false))
   }
 
   const handleActivation = async (wallet: WalletInfo) => {
     setWallet(wallet)
-    await tryActivation(wallet?.connector)
+    if (wallet?.connector) {
+      await tryActivation(wallet.connector)
+    }
   }
 
   const tryActivationAgain = async () => {
     setHasError(false)
-    // TODO: Problem in wallet
-    await tryActivation(wallet?.connector)
+    if (wallet?.connector) {
+      await tryActivation(wallet.connector)
+    }
   }
 
   const handleClose = () => {
     onClose()
     setHasError(false)
     setPendding(false)
-    setWallet(null)
   }
 
   return (
@@ -91,7 +92,11 @@ const WalletModal = ({ show, onClose }: WalletModalProps) => {
         <div className="flex items-center">
           <label className="font-medium text-left text-md text-gray-700 dark:text-gray-50">
             Error connecting
-            <span className="ml-1 text-blue-500 cursor-pointer" onClick={tryActivationAgain}>Try again</span>.
+            <span
+              className="ml-1 text-blue-500 cursor-pointer"
+              onClick={tryActivationAgain}>
+              Try again
+            </span>.
           </label>
         </div>
       )}

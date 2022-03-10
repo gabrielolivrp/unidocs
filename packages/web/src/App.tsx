@@ -4,7 +4,7 @@ import {
   JsonRpcFetchFunc,
   Web3Provider
 } from '@ethersproject/providers'
-import { ThemeProvider } from './contexts'
+import { ThemeProvider, DAppProvider } from './contexts'
 import Web3Manager from './components/Web3Manager'
 import Home from './pages/Home'
 import './styles/app.css'
@@ -23,9 +23,11 @@ function getLibrary (provider: ExternalProvider | JsonRpcFetchFunc) {
 const App = () => (
   <Web3ReactProvider getLibrary={getLibrary}>
     <Web3Manager>
-      <ThemeProvider>
-        <Home />
-      </ThemeProvider>
+      <DAppProvider>
+        <ThemeProvider>
+          <Home />
+        </ThemeProvider>
+      </DAppProvider>
     </Web3Manager>
   </Web3ReactProvider>
 )

@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core'
 import { formatEther } from '@ethersproject/units'
 import { useDisclosure, useBalance } from './../../hooks'
 import { formatAddress } from './../../utils'
-import { Theme, useTheme } from './../../contexts'
+import { Theme, useTheme, useDApp } from './../../contexts'
 import { FiGithub, FiAlertCircle } from 'react-icons/fi'
 import {
   MdOutlineMoreVert,
@@ -53,8 +53,7 @@ const ButtonInfo = () => (
 
 const AccountButton = () => {
   const { isOpen, handleClose, handleOpen } = useDisclosure()
-  const { account } = useWeb3React()
-  const balance = useBalance()
+  const { balance, account } = useDApp()
 
   return (
     <div className="text-sm md:text-lg font-semibold">
@@ -75,7 +74,7 @@ const AccountButton = () => {
 
 const Header = () => {
   const { isOpen, handleClose, handleOpen } = useDisclosure()
-  const { active } = useWeb3React()
+  const { active } = useDApp()
 
   return (
     <div className="flex justify-center">
