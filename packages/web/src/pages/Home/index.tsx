@@ -1,36 +1,92 @@
-import Tabs, { TabItem, TabItems, TabPanel, TabPanels } from '../../components/Tabs'
-import Card from '../../components/Card'
-import Header from './../../components/Header'
+import {
+  Box,
+  Button,
+  Container,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  useDisclosure,
+  VStack
+} from '@chakra-ui/react'
+import Dropzone from '../../components/Dropzone'
+import Header from '../../components/Header'
+import Documents from '../../components/Documents'
+import ConfirmTransactionModal from '../../components/ConfirmTransactionModal'
 
-const Home = () => (
-  <div className="flex justify-center">
-    <div className="px-8 container">
-      <Header />
-      <div className="mt-40 flex justify-center items-center">
-        <div className="w-full sm:max-w-lg">
-          <Card>
-            <Tabs>
-              <TabItems>
-                <TabItem>Upload Documents</TabItem>
-                <TabItem>My Documents</TabItem>
-              </TabItems>
-              <TabPanels>
+const documents = [
+  { name: 'photo.jpg', size: '600kb', mimiType: 'image' },
+  { name: 'doc.pdf', size: '600kb', mimiType: 'application/pdf' },
+  { name: 'video.mp4', size: '600kb', mimiType: 'video' },
+  { name: 'audio.mp3', size: '600kb', mimiType: 'audio' }
+]
+
+const Home = () => {
+  const { isOpen, onClose, onOpen } = useDisclosure()
+
+  return (
+    <VStack spacing="40">
+      <Container maxW="container.lg">
+        <Header />
+      </Container>
+      <Container
+        maxW="container.lg"
+        centerContent
+      >
+        <Box
+          rounded="xl"
+          shadow="md"
+          border="1px"
+          borderColor="blackAlpha.300"
+          width="2xl"
+          px="5"
+        >
+          <Tabs
+            variant="soft-rounded"
+            colorScheme="purple"
+            isFitted
+          >
+            <Box
+              py="5"
+              borderBottom="1px"
+              borderColor="blackAlpha.300"
+            >
+              <TabList>
+                <Tab>Upload Document</Tab>
+                <Tab>My Documents</Tab>
+              </TabList>
+            </Box>
+            <Box pb="5">
+              <TabPanels bgColor="transparent">
                 <TabPanel>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Ea error voluptates
+                  <Dropzone onFileUploaded={() => { }} />
+                  <Box mt="5">
+                    <Button
+                      size="lg"
+                      width="full"
+                      rounded="full"
+                      colorScheme="purple"
+                      onClick={onOpen}
+                    >
+                      Upload
+                    </Button>
+                  </Box>
                 </TabPanel>
                 <TabPanel>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Ea error voluptates voluptatibus dicta, maxime a et illum atque
-                  praesentium quis hic c
+                  <Documents documents={documents} />
                 </TabPanel>
               </TabPanels>
-            </Tabs>
-          </Card>
-        </div>
-      </div>
-    </div>
-  </div>
-)
+            </Box>
+          </Tabs>
+          <ConfirmTransactionModal
+            isOpen={isOpen}
+            onClose={onClose}
+          />
+        </Box>
+      </Container>
+    </VStack>
+  )
+}
 
 export default Home

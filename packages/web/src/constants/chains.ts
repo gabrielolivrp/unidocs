@@ -1,17 +1,25 @@
 export enum SupportedChainId {
   MAINNET = 1,
-  ROPSTEN = 3,
-  RINKEBY = 4,
-  GOERLI = 5,
-  KOVAN = 42,
   LOCALHOST = 31337,
 }
 
 export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
-  SupportedChainId.LOCALHOST,
-  SupportedChainId.GOERLI,
-  SupportedChainId.RINKEBY,
-  SupportedChainId.KOVAN,
-  SupportedChainId.ROPSTEN,
-  SupportedChainId.MAINNET
+  SupportedChainId.MAINNET,
+  SupportedChainId.LOCALHOST
 ]
+
+interface ChainInfo {
+  readonly name: string
+  readonly explorer: string
+}
+
+export const CHAIN_INFO = {
+  [SupportedChainId.MAINNET]: {
+    name: 'MainNet',
+    explorer: 'https://etherscan.io/'
+  },
+  [SupportedChainId.LOCALHOST]: {
+    name: 'Localhost',
+    explorer: ''
+  }
+} as { [chainId: number]: ChainInfo }

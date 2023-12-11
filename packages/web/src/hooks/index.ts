@@ -1,6 +1,4 @@
-export * from './useLocalStorage'
 export * from './useEagerConnect'
 export * from './useInactiveListener'
-export * from './useDisclosure'
 export * from './useBalance'
 export * from './useContract'

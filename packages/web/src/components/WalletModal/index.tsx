@@ -1,33 +1,60 @@
 import { useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import {
+  Box,
+  Text,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  VStack,
+  HStack
+} from '@chakra-ui/react'
+import {
+  SUPPORTED_WALLETS,
+  WalletInfo
+} from './../../constants/wallets'
 import { useDApp } from '../../contexts'
-import { MdOutlineDataUsage } from 'react-icons/md'
-import { SUPPORTED_WALLETS, WalletInfo } from './../../constants/wallets'
-import Modal from './../../components/Modal'
 
-interface WalletProps {
+export interface WalletProps {
   wallet: WalletInfo
   onClick: () => void
 }
 
 const Wallet = ({ wallet, onClick }: WalletProps) => (
-  <div
-    className="flex justify-between items-center cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-700"
-    onClick={onClick}>
-    <label className="font-medium text-md text-gray-700 dark:text-gray-50 cursor-pointer">
+  <HStack
+    p="2"
+    border="1px"
+    borderColor="blackAlpha.300"
+    rounded="lg"
+    width="full"
+    cursor="pointer"
+    justifyContent="space-between"
+    onClick={onClick}
+  >
+    <Text
+      fontSize="md"
+      fontWeight="bold"
+    >
       {wallet.name}
-    </label>
-    <img className="w-8 h-8" src={wallet.iconURL} alt={wallet.name} />
-  </div>
+    </Text>
+    <Box boxSize="10">
+      <Image src={wallet.iconURL} alt={wallet.name} />
+    </Box>
+  </HStack>
 )
 
 export interface WalletModalProps {
-  show: boolean
+  isOpen: boolean
   onClose: () => void
 }
 
-const WalletModal = ({ show, onClose }: WalletModalProps) => {
+const WalletModal = ({ isOpen, onClose }: WalletModalProps) => {
   const { wallet, setWallet } = useDApp()
   const { activate } = useWeb3React()
   const [hasError, setHasError] = useState(false)
@@ -63,43 +90,58 @@ const WalletModal = ({ show, onClose }: WalletModalProps) => {
   }
 
   return (
-    <Modal title="Connect a wallet" open={show} onClose={handleClose}>
-      <div className="flex flex-col space-y-4">
-        {!pendding && !hasError &&
-          Object.keys(SUPPORTED_WALLETS).map(key => {
-            const wallet = SUPPORTED_WALLETS[key]
-            return (
-              <Wallet
-                key={key}
-                wallet={wallet}
-                onClick={() => handleActivation(wallet)}
-              />
-            )
-          })}
-      </div>
-      {pendding && (
-        <div className="flex flex-col">
-          <p className="font-medium text-left text-md text-gray-700 dark:text-gray-50">
-            Waiting your permission for connection in your <b>{wallet?.name}</b>
-          </p>
-          <div className="flex items-center mt-4">
-            <MdOutlineDataUsage size="1rem" className="animate-spin text-gray-700 dark:text-gray-50" />
-            <label className="ml-2 font-medium text-left text-sm text-gray-700 dark:text-gray-50">Waiting...</label>
-          </div>
-        </div>
-      )}
-      {hasError && (
-        <div className="flex items-center">
-          <label className="font-medium text-left text-md text-gray-700 dark:text-gray-50">
-            Error connecting
-            <span
-              className="ml-1 text-blue-500 cursor-pointer"
-              onClick={tryActivationAgain}>
-              Try again
-            </span>.
-          </label>
-        </div>
-      )}
+    <Modal
+      isCentered
+      size="sm"
+      isOpen={isOpen}
+      onClose={handleClose}
+    >
+      <ModalOverlay />
+      <ModalContent pb="5" rounded="xl">
+        <ModalHeader>Connect a wallet</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          {!pendding && !hasError &&
+            <VStack spacing="2">
+              {Object.keys(SUPPORTED_WALLETS).map(key => {
+                const wallet = SUPPORTED_WALLETS[key]
+                return (
+                  <Wallet
+                    key={key}
+                    wallet={wallet}
+                    onClick={() => handleActivation(wallet)}
+                  />
+                )
+              })}
+            </VStack>
+          }
+          {pendding && (
+            <VStack p="2" border="1px" borderColor="blackAlpha.300" rounded="lg">
+              <Text>
+                Waiting your permission for connection in your <Text as="span">
+                  {wallet?.name}
+                </Text>
+              </Text>
+              <HStack width="full">
+                <Spinner size="sm" color='purple' />
+                <Text>Waiting...</Text>
+              </HStack>
+            </VStack>
+          )}
+          {hasError && (
+            <Text>
+              Error connecting <Text
+                as="span"
+                fontWeight="bold"
+                cursor="pointer"
+                onClick={tryActivationAgain}
+              >
+                Try again
+              </Text>.
+            </Text>
+          )}
+        </ModalBody>
+      </ModalContent>
     </Modal>
   )
 }

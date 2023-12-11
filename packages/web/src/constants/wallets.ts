@@ -14,5 +14,10 @@ export const SUPPORTED_WALLETS: {
     connector: injected,
     name: 'MetaMask',
     iconURL: '/assets/images/metamask.png'
+  },
+  METAMASK2: {
+    connector: injected,
+    name: 'MetaMask2',
+    iconURL: '/assets/images/metamask.png'
   }
 }

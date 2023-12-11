@@ -1,15 +1,16 @@
+import { ChakraProvider } from '@chakra-ui/react'
 import { Web3ReactProvider } from '@web3-react/core'
 import {
   ExternalProvider,
   JsonRpcFetchFunc,
   Web3Provider
 } from '@ethersproject/providers'
-import { ThemeProvider, DAppProvider } from './contexts'
+import { DAppProvider } from './contexts'
 import Web3Manager from './components/Web3Manager'
 import Home from './pages/Home'
-import './styles/app.css'
+import theme from './styles/theme'
 
-function getLibrary (provider: ExternalProvider | JsonRpcFetchFunc) {
+const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => {
   const library = new Web3Provider(provider)
 
   library.detectNetwork()
@@ -24,9 +25,9 @@ const App = () => (
   <Web3ReactProvider getLibrary={getLibrary}>
     <Web3Manager>
       <DAppProvider>
-        <ThemeProvider>
+        <ChakraProvider theme={theme}>
           <Home />
-        </ThemeProvider>
+        </ChakraProvider>
       </DAppProvider>
     </Web3Manager>
   </Web3ReactProvider>
