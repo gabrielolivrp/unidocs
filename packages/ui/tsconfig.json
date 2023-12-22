@@ -1,0 +1,4 @@
+{
+  "extends": "@unidocs/tsconfig/ui.json",
+  "exclude": ["dist", "build", "node_modules"]
+}

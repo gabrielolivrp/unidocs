@@ -1,0 +1,4 @@
+{
+  "extends": "@unidocs/tsconfig/contracts.json",
+  "exclude": ["dist", "node_modules"]
+}

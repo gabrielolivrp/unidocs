@@ -1,0 +1,16 @@
+{
+  "extends": "@unidocs/tsconfig/web.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "exclude": ["dist", "build", "node_modules"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "contexts/LoadingProvider copy_"]
+}
