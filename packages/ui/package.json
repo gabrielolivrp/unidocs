@@ -1,0 +1,19 @@
+{
+  "name": "@unidocs/ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "devDependencies": {
+    "@unidocs/tsconfig": "*",
+    "@unidocs/common": "*",
+    "@unidocs/tailwind-config": "*",
+    "@types/react": "18.2.25",
+    "@types/react-dom": "18.2.11",
+    "@headlessui/react": "^1.7.17",
+    "react": "18.2.0",
+    "typescript": "^5.2.2",
+    "class-variance-authority": "^0.7.0",
+    "lucide-react": "^0.279.0"
+  }
+}

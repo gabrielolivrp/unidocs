@@ -1,0 +1,15 @@
+{
+  "name": "@unidocs/tsconfig",
+  "version": "1.0.0",
+  "private": true,
+  "files": [
+    "contracts.json",
+    "base.json",
+    "web.json",
+    "ui.json",
+    "common.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
