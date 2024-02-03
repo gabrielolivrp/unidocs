@@ -1,5 +1,5 @@
-import { HardhatUserConfig, task } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-viem";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -11,23 +11,7 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  gasReporter: {
-    enabled: true,
-    currency: "USD",
-    outputFile: "gas-report.txt",
-  },
-  typechain: {
-    outDir: "typechain",
-    target: "ethers-v6",
-  },
+  defaultNetwork: "localhost",
 };
-
-task("accounts", "Prints the list of accounts", async (_args, { ethers }) => {
-  const accounts = await ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(await account.address);
-  }
-});
 
 export default config;

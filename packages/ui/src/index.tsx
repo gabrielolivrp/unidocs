@@ -12,3 +12,4 @@ export * from "./card";
 export * from "./icon";
 export * from "./loader";
 export * from "./switch";
+export * from "./dropdown";

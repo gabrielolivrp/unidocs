@@ -1,36 +1,28 @@
 import fs from "fs";
-import { ethers } from "hardhat";
+import hre from "hardhat";
+import { Address, getAddress } from "viem";
 
-import * as types from "../typechain";
-
-const generatedPath = `${__dirname}/../../web/generated`;
+const generatedPath = `${__dirname}/../../web/src/generated`;
 
 async function deploy(
+  deployerAddress: Address,
   contractName: string,
-  args: Array<unknown>,
-  deployerAddress: string
+  args: any[]
 ) {
   console.log(
     `Deploying the contracts ${contractName} with the account: ${deployerAddress}`
   );
 
-  const contract = await ethers.deployContract(contractName, args);
-  await contract.waitForDeployment();
-
-  const contractAddress = await contract.getAddress();
-  console.log(`Contract address: ${contractAddress}`);
-
-  const factory = types[
-    `${contractName}__factory` as keyof typeof types
-  ] as any;
+  const contract = await hre.viem.deployContract(contractName, args);
+  console.log(`Contract address: ${contract.address}`);
 
   if (!fs.existsSync(generatedPath)) {
     fs.mkdirSync(generatedPath);
   }
 
   const data = {
-    address: contractAddress,
-    abi: factory.abi,
+    address: contract.address,
+    abi: contract.abi,
   };
 
   fs.writeFileSync(
@@ -40,10 +32,9 @@ async function deploy(
 }
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
-  const deployerAddress = await deployer.getAddress();
-
-  await deploy("Greeter", ["Hello, Hardhat!"], deployerAddress);
+  const [deployer, _] = await hre.viem.getWalletClients();
+  const deployerAddress = getAddress(deployer.account.address);
+  await deploy(deployerAddress, "Unidocs", []);
 }
 
 main().catch((error) => {

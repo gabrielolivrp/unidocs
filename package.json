@@ -10,6 +10,7 @@
     "web:dev": "yarn workspace @unidocs/web dev",
     "contracts:lint": "yarn workspace @unidocs/contracts lint",
     "contracts:chain": "yarn workspace @unidocs/contracts chain",
+    "contracts:test": "yarn workspace @unidocs/contracts test",
     "contracts:compile": "yarn workspace @unidocs/contracts compile",
     "contracts:deploy": "yarn workspace @unidocs/contracts deploy",
     "bootstrap": "npx lerna bootstrap --use-workspaces"
