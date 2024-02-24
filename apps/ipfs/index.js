@@ -11,7 +11,7 @@ const ipfs = await create();
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
-app.post("/get", async (req, res) => {
+app.post("/api/get", async (req, res) => {
   const schema = Joi.object({
     cids: Joi.array().items(Joi.string()).required(),
   });
@@ -32,7 +32,7 @@ app.post("/get", async (req, res) => {
       chunks[cid] = Buffer.concat(buffer).toString();
     }
 
-    res.status(200).json({ data: chunks });
+    res.status(200).json({ chunks });
   } catch (error) {
     res
       .status(500)
@@ -40,7 +40,7 @@ app.post("/get", async (req, res) => {
   }
 });
 
-app.post("/upload", async (req, res) => {
+app.post("/api/storage", async (req, res) => {
   const schema = Joi.object({
     chunks: Joi.object().required(),
   });
@@ -53,12 +53,12 @@ app.post("/upload", async (req, res) => {
     const { chunks } = validated.value;
 
     const cids = {};
-    for (const [key, chunk] of Object.entries(chunks)) {
+    for (const [index, chunk] of Object.entries(chunks)) {
       const cid = await ipfs.add(chunk);
-      cids[key] = cid;
+      cids[index] = cid.path;
     }
 
-    res.json({ data: cids });
+    res.json({ cids });
   } catch (error) {
     res
       .status(500)
