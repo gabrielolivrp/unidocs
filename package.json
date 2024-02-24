@@ -8,6 +8,7 @@
   "scripts": {
     "web:lint": "yarn workspace @unidocs/web lint",
     "web:dev": "yarn workspace @unidocs/web dev",
+    "ipfs:dev": "yarn workspace @unidocs/ipfs dev",
     "contracts:lint": "yarn workspace @unidocs/contracts lint",
     "contracts:chain": "yarn workspace @unidocs/contracts chain",
     "contracts:test": "yarn workspace @unidocs/contracts test",
