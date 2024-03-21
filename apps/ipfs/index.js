@@ -29,7 +29,7 @@ app.post("/api/get", async (req, res) => {
       for await (const chunk of await ipfs.cat(cid)) {
         buffer.push(chunk);
       }
-      chunks[cid] = Buffer.concat(buffer).toString();
+      chunks[cid] = JSON.parse(Buffer.concat(buffer).toString());
     }
 
     res.status(200).json({ chunks });
@@ -54,7 +54,7 @@ app.post("/api/storage", async (req, res) => {
 
     const cids = {};
     for (const [index, chunk] of Object.entries(chunks)) {
-      const cid = await ipfs.add(chunk);
+      const cid = await ipfs.add(JSON.stringify({ index, chunk }));
       cids[index] = cid.path;
     }
 
