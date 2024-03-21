@@ -1,0 +1,3 @@
+{
+  "extends": "@unidocs/tsconfig/use-unidocs.json"
+}
