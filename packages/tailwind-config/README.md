@@ -1,1 +1,1 @@
-## Tailwind CSS Config
+## @unidocs/tailwind-config
