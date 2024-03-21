@@ -2,32 +2,34 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-// import "hardhat/console.sol";
-
 contract Unidocs {
-  struct Document {
-    uint256 tokenId;
-    string filename;
-    string checksum;
-    string mimetype;
-    uint256 filesize;
+  struct Version {
+    uint versionId;
     string[] ipfs;
+    string filename;
+    uint256 filesize;
+    string description;
+    string mimetype;
+    string checksum;
+    uint createdAt;
+  }
+
+  struct Document {
+    uint256 fileId;
+    address owner;
+    uint256 totalVersions;
+    uint createdAt;
   }
 
   address public owner;
-  uint256 public total = 0;
-  mapping(address => Document[]) private ownerDocuments;
-  mapping(uint256 => address) private documentOwners;
+  uint256 public totalDocuments = 0;
 
-  event DocumentStored(
-    address indexed owner,
-    uint256 indexed tokenId,
-    string filename,
-    string checksum,
-    string mimetype,
-    uint256 filesize,
-    string[] ipfs
-  );
+  // owner => documents
+  mapping(address => Document[]) private ownerDocuments;
+  // fileId => versions
+  mapping(uint256 => Version[]) private documentVersions;
+  // fileId => owner
+  mapping(uint256 => address) private documentOwners;
 
   constructor() {
     owner = msg.sender;
@@ -36,46 +38,116 @@ contract Unidocs {
   receive() external payable {}
 
   fallback() external payable {}
-  
+
   function storeDocument(
     string memory _filename,
+    string memory  _description,
     string[] memory _ipfs,
     string memory _checksum,
     string memory _mimetype,
     uint256 _filesize
-  ) public {
+  ) public payable {
     Document memory document = Document({
-      tokenId: total,
+      fileId: totalDocuments,
+      owner: msg.sender,
+      totalVersions: 1,
+      createdAt: _getCurrentTime()
+    });
+
+    Version memory newVersion = Version({
+      versionId: 1,
       filename: _filename,
+      description: _description,
       checksum: _checksum,
       mimetype: _mimetype,
       filesize: _filesize,
-      ipfs: _ipfs
+      ipfs: _ipfs,
+      createdAt: _getCurrentTime()
     });
 
     ownerDocuments[msg.sender].push(document);
-    documentOwners[total] = msg.sender;
-    total++;
+    documentVersions[totalDocuments].push(newVersion);
+    documentOwners[totalDocuments] = msg.sender;
 
-    emit DocumentStored(msg.sender, total, _filename, _checksum, _mimetype, _filesize, _ipfs);
+    totalDocuments++;
   }
 
-  function getDocuments(address account) public view returns (Document[] memory) {
-    return ownerDocuments[account];
+  function updateDocument(
+    uint256 _fileId,
+    string memory _filename,
+    string memory _description,
+    string[] memory _ipfs,
+    string memory _checksum,
+    string memory _mimetype,
+    uint256 _filesize
+  ) public payable {
+    require(documentOwners[_fileId] != address(0), "Document not found");
+    require(documentOwners[_fileId] == msg.sender, "You are not the owner of this document");
+
+    Version memory newVersion = Version({
+      versionId: ownerDocuments[msg.sender][_fileId].totalVersions + 1,
+      filename: _filename,
+      description: _description,
+      checksum: _checksum,
+      mimetype: _mimetype,
+      filesize: _filesize,
+      ipfs: _ipfs,
+      createdAt: _getCurrentTime()
+    });
+
+    ownerDocuments[msg.sender][_fileId].totalVersions += 1;
+    documentVersions[_fileId].push(newVersion);
   }
 
-  function getDocument(uint256 tokenId) public view returns (Document memory) {
-    require(documentOwners[tokenId] != address(0), "Not found");
-    address account = documentOwners[tokenId];
-    return _findDocumentByToken(ownerDocuments[account], tokenId);
+  function transferDocument(address _to, uint256 _fileId) public {
+    require(documentOwners[_fileId] == msg.sender, "You are not the owner of this document");
+    uint256 index = _findDocumentIndexByToken(ownerDocuments[msg.sender], _fileId);
+    require(index < ownerDocuments[msg.sender].length, "Document index out of bounds");
+
+    Document memory document = ownerDocuments[msg.sender][index];
+    for (uint256 i = index; i < ownerDocuments[msg.sender].length - 1; i++) {
+      ownerDocuments[msg.sender][i] = ownerDocuments[msg.sender][i + 1];
+    }
+    ownerDocuments[msg.sender].pop();
+
+    document.owner = _to;
+    ownerDocuments[_to].push(document);
+    documentOwners[_fileId] = _to;
   }
 
-  function _findDocumentByToken(Document[] memory documents, uint256 tokenId) private pure returns (Document memory) {
-    for (uint i = 0; i < documents.length; i++) {
-      if (documents[i].tokenId == tokenId) {
-        return documents[i];
+  function getDocumentVersions(uint256 _fileId) public view returns (Version[] memory) {
+    return documentVersions[_fileId];
+  }
+
+  function getDocuments(address _account) public view returns (Document[] memory, Version[][] memory) {
+    Document[] memory documents = ownerDocuments[_account];
+    Version[][] memory versions = new Version[][](documents.length);
+
+    for (uint256 i = 0; i < documents.length; i++) {
+      uint256 fileId = documents[i].fileId;
+      versions[i] = documentVersions[fileId];
+    }
+
+    return (documents, versions);
+  }
+
+  function getDocument(uint256 _fileId) public view returns (Document memory, Version[] memory) {
+    require(documentOwners[_fileId] != address(0), "Not found");
+    address account = documentOwners[_fileId];
+    uint256 index = _findDocumentIndexByToken(ownerDocuments[account], _fileId);
+    return (ownerDocuments[account][index], documentVersions[_fileId]);
+  }
+
+  function _findDocumentIndexByToken(Document[] memory documents, uint256 _fileId) private pure returns (uint256) {
+    for (uint256 i = 0; i < documents.length; i++) {
+      if (documents[i].fileId == _fileId) {
+        return i;
       }
     }
     revert("Document not found");
+  }
+
+  function _getCurrentTime() public view returns(uint){
+    return block.timestamp;
   }
 }
