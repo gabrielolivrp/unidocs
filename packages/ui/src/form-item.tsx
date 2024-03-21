@@ -1,11 +1,11 @@
 import * as React from "react";
 
-export interface FormGroupProps {
+export interface FormItemProps {
   children: React.ReactNode;
 }
 
-const FormGroup = ({ children }: FormGroupProps) => (
+const FormItem = ({ children }: FormItemProps) => (
   <div className="flex flex-col space-y-1.5">{children}</div>
 );
 
-export { FormGroup };
+export { FormItem };
