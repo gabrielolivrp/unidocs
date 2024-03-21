@@ -1,1 +1,1 @@
-## TSConfig
+## @unidocs/tsconfig
