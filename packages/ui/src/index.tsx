@@ -18,3 +18,4 @@ export * from "./sheet";
 export * from "./avatar";
 export * from "./form-label";
 export * from "./form-message";
+export * from "./select";
