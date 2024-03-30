@@ -45,7 +45,7 @@ app.post("/api/get", async (req, res) => {
 
     res.status(200).json({ chunks });
   } catch (error) {
-    res.status(500).json({ errors: [{ message: error }] });
+    res.status(500).json({ errors: [{ message: error.message }] });
   }
 });
 
@@ -70,7 +70,7 @@ app.post("/api/storage", async (req, res) => {
 
     res.json({ cids });
   } catch (error) {
-    res.status(500).json({ errors: [{ message: error }] });
+    res.status(500).json({ errors: [{ message: error.message }] });
   }
 });
 
