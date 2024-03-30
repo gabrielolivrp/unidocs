@@ -45,10 +45,7 @@ app.post("/api/get", async (req, res) => {
 
     res.status(200).json({ chunks });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ errors: [{ message: "Error retrieving file from IPFS" }] });
+    res.status(500).json({ errors: [{ message: error }] });
   }
 });
 
@@ -73,10 +70,7 @@ app.post("/api/storage", async (req, res) => {
 
     res.json({ cids });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ errors: [{ message: "Error uploading chunks to IPFS." }] });
+    res.status(500).json({ errors: [{ message: error }] });
   }
 });
 
