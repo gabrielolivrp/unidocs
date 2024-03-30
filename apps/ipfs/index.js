@@ -2,6 +2,7 @@ import { create } from "ipfs-core";
 import express from "express";
 import cors from "cors";
 import Joi from "joi";
+import CryptoJS from "crypto-js";
 import "dotenv/config";
 
 const port = process.env.PORT || 3005;
@@ -10,6 +11,16 @@ const ipfs = await create();
 
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
+
+const encrypt = (data) =>
+  CryptoJS.AES.encrypt(JSON.stringify(data), process.env.SECRET_KEY).toString();
+
+const decrypt = (ciphertext) =>
+  JSON.parse(
+    CryptoJS.AES.decrypt(ciphertext, process.env.SECRET_KEY).toString(
+      CryptoJS.enc.Utf8
+    )
+  );
 
 app.post("/api/get", async (req, res) => {
   const schema = Joi.object({
@@ -29,11 +40,12 @@ app.post("/api/get", async (req, res) => {
       for await (const chunk of await ipfs.cat(cid)) {
         buffer.push(chunk);
       }
-      chunks[cid] = JSON.parse(Buffer.concat(buffer).toString());
+      chunks[cid] = decrypt(Buffer.concat(buffer).toString());
     }
 
     res.status(200).json({ chunks });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ errors: [{ message: "Error retrieving file from IPFS" }] });
@@ -54,12 +66,14 @@ app.post("/api/storage", async (req, res) => {
 
     const cids = {};
     for (const [index, chunk] of Object.entries(chunks)) {
-      const cid = await ipfs.add(JSON.stringify({ index, chunk }));
+      const data = encrypt({ index, chunk });
+      const cid = await ipfs.add(data);
       cids[index] = cid.path;
     }
 
     res.json({ cids });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ errors: [{ message: "Error uploading chunks to IPFS." }] });
