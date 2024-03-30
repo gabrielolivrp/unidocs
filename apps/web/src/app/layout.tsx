@@ -6,6 +6,7 @@ import { wagmiConfig } from "@/config";
 import { Providers } from "./providers";
 
 import "./globals.css";
+import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
 
 export const metadata: Metadata = {
   title: "Unidocs",
@@ -23,8 +24,8 @@ const RootLayout = ({
   );
 
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-background antialiased">
+    <html suppressHydrationWarning lang="en">
+      <body className="min-h-screen bg-background antialiased overflow-x-hidden">
         <Web3ModalProvider initialState={initialState}>
           <Providers>{children}</Providers>
         </Web3ModalProvider>

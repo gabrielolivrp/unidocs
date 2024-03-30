@@ -1,3 +1,3 @@
-export * from "./ConfirmProvider";
-export * from "./LoadingProvider";
-export * from "./Web3ModalProvider";
+export * from "./loading-provider";
+export * from "./alert-provider";
+export * from "./web3modal-provider";

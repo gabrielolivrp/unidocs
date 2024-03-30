@@ -58,3 +58,8 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+:root {
+  --wui-color-modal-bg: hsl(var(--background)) !important;
+  --wui-cover: rgb(0 0 0 / 0.8) !important;
+}

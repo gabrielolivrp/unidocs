@@ -1,13 +1,12 @@
-"use client";
 import { Icon, Icons } from "@unidocs/ui";
 
-interface DocumentIconProps {
+interface FileIconProps {
   mimetype: string;
   size?: string | number | undefined;
 }
 
-const icon = (mimeType: string): Icons => {
-  switch (mimeType) {
+const icon = (mimetype: string): Icons => {
+  switch (mimetype) {
     case "image/jpeg":
     case "image/png":
       return "FileImage";
@@ -22,8 +21,8 @@ const icon = (mimeType: string): Icons => {
   }
 };
 
-const DocumentIcon = ({ mimetype, size }: DocumentIconProps) => (
-  <Icon name={icon(mimetype)} size={size} />
+const FileIcon = ({ mimetype, size }: FileIconProps) => (
+  <Icon name={icon(mimetype)} size={size} strokeWidth={0.5} />
 );
 
-export { DocumentIcon };
+export { FileIcon };

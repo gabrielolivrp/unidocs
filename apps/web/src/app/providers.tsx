@@ -1,7 +1,7 @@
 "use client";
 
 import { Progress } from "@/components";
-import { ConfirmProvider, LoadingProvider } from "@/contexts";
+import { AlertProvider, LoadingProvider } from "@/contexts";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
@@ -13,9 +13,9 @@ export const Providers = ({ children }: { children: React.ReactNode }) => (
     disableTransitionOnChange
   >
     <Progress />
-    <ConfirmProvider>
-      <LoadingProvider>{children}</LoadingProvider>
-    </ConfirmProvider>
+    <LoadingProvider>
+      <AlertProvider>{children}</AlertProvider>
+    </LoadingProvider>
     <Toaster />
   </ThemeProvider>
 );

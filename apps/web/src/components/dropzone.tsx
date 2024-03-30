@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useState } from "react";
 import { Card, Icon } from "@unidocs/ui";
 import { useDropzone } from "react-dropzone";
@@ -6,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 type State = "accept" | "reject" | "active" | null;
 
 interface DropzoneProps {
+  onRemove: () => void;
   onAccept: (file: File) => void;
   onReject: () => void;
 }
@@ -48,13 +48,14 @@ const UploadText = ({ state }: UploadTextProps) => {
   );
 };
 
-export const Dropzone = ({ onAccept }: DropzoneProps) => {
+export const Dropzone = ({ onAccept, onRemove }: DropzoneProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [state, setState] = useState<State>(null);
 
   const removeFile = useCallback(() => {
     setFile(null);
     setState(null);
+    onRemove();
   }, [file]);
 
   const onDrop = useCallback((files: File[]) => {

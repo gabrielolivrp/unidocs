@@ -9,20 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.17",
-    "@tanstack/react-query": "^5.17.19",
+    "@unidocs/use-unidocs": "*",
+    "@unidocs/ui": "*",
     "@types/node": "20.8.0",
     "@types/react": "18.2.25",
+    "@types/file-saver": "^2.0.7",
     "@types/react-dom": "18.2.11",
-    "@unidocs/ui": "*",
     "@web3modal/wagmi": "4.0.0-alpha.3",
+    "@tanstack/react-query": "^5.17.19",
+    "axios": "^1.6.7",
     "sonner": "^1.3.1",
     "abitype": "^0.9.8",
     "class-variance-authority": "^0.7.0",
     "eslint": "8.50.0",
     "eslint-config-next": "14.1.0",
     "joi": "^17.10.2",
-    "next": "14.1.0",
+    "next": "14.0.4",
     "next-themes": "^0.2.1",
     "nextjs-progressbar": "^0.0.16",
     "react": "18.2.0",
@@ -30,8 +32,7 @@
     "react-dropzone": "^14.2.3",
     "typescript": "5.2.2",
     "viem": "^2.5.0",
-    "wagmi": "^2.5.2",
-    "crypto": "^1.0.1"
+    "wagmi": "^2.5.2"
   },
   "devDependencies": {
     "@unidocs/tailwind-config": "*",

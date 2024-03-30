@@ -40,7 +40,11 @@ export const LoadingProvider = ({ children }: LoadingProviderProps) => {
       value={{ loading, message, startLoading, finishLoading }}
     >
       {children}
-      <LoadingDialog open={loading} onClose={finishLoading} message={message} />
+      <LoadingDialog
+        open={loading}
+        onOpenChange={finishLoading}
+        message={message}
+      />
     </LoadingContext.Provider>
   );
 };

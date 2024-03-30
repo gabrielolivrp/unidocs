@@ -10,7 +10,7 @@ import ConfirmDialog from "@/components/confirm-dialog";
 
 export type ConfirmParams = {
   title: string;
-  message: string;
+  message: ReactNode;
   onConfirm: () => void | Promise<void>;
   onCancel?: () => void | Promise<void>;
 };
@@ -42,7 +42,7 @@ export const ConfirmProvider = ({ children }: ConfirmProviderProps) => {
     }
   }, [confirmParams]);
 
-  const handleCancel = useCallback(() => {
+  const handleChange = useCallback(() => {
     if (confirmParams) {
       if (confirmParams.onCancel) {
         confirmParams.onCancel();
@@ -58,11 +58,12 @@ export const ConfirmProvider = ({ children }: ConfirmProviderProps) => {
       {confirmParams && (
         <ConfirmDialog
           title={confirmParams.title}
-          message={confirmParams.message}
           open={open}
           onConfirm={handleConfirm}
-          onCancel={handleCancel}
-        />
+          onOpenChange={handleChange}
+        >
+          {confirmParams.message}
+        </ConfirmDialog>
       )}
     </ConfirmContext.Provider>
   );

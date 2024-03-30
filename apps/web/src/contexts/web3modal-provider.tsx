@@ -14,18 +14,18 @@ createWeb3Modal({
   defaultChain,
 });
 
-function Web3ModalProvider({
+const Web3ModalProvider = ({
   children,
   initialState,
 }: {
   children: ReactNode;
   initialState: State | undefined;
-}) {
+}) => {
   return (
     <WagmiProvider config={wagmiConfig} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
-}
+};
 
 export { Web3ModalProvider };

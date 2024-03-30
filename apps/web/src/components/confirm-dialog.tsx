@@ -1,4 +1,3 @@
-"use client";
 import {
   Button,
   Dialog,
@@ -10,33 +9,44 @@ import {
 
 type ConfirmDialogProps = {
   title: string;
-  message: string;
+  children: React.ReactNode;
   open: boolean;
   onConfirm: () => void | Promise<void>;
-  onCancel: () => void | Promise<void>;
+  onCancel?: () => void | Promise<void>;
+  onOpenChange: (open: boolean) => void | Promise<void>;
 };
 
 const ConfirmDialog = ({
   title,
   open,
-  message,
+  children,
   onConfirm,
   onCancel,
-}: ConfirmDialogProps): JSX.Element => (
-  <Dialog open={open} onClose={onCancel}>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-      </DialogHeader>
-      <p>{message}</p>
-      <DialogFooter>
-        <Button autoFocus variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button onClick={onConfirm}>Confirm</Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-);
+  onOpenChange,
+}: ConfirmDialogProps) => {
+  const handleCancel = () => {
+    onOpenChange(false);
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        {children}
+        <DialogFooter>
+          <Button autoFocus variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button onClick={onConfirm}>Confirm</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export default ConfirmDialog;

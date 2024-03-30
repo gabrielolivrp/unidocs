@@ -7,104 +7,17 @@ export default {
       "type": "constructor"
     },
     {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "filename",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "checksum",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "mimetype",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "filesize",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "string[]",
-          "name": "ipfs",
-          "type": "string[]"
-        }
-      ],
-      "name": "DocumentStored",
-      "type": "event"
-    },
-    {
       "stateMutability": "payable",
       "type": "fallback"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getDocument",
+      "inputs": [],
+      "name": "fileCount",
       "outputs": [
         {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "tokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "filename",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "checksum",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "mimetype",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "filesize",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string[]",
-              "name": "ipfs",
-              "type": "string[]"
-            }
-          ],
-          "internalType": "struct Unidocs.Document",
+          "internalType": "uint256",
           "name": "",
-          "type": "tuple"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -114,32 +27,49 @@ export default {
       "inputs": [
         {
           "internalType": "address",
-          "name": "account",
+          "name": "_account",
           "type": "address"
         }
       ],
-      "name": "getDocuments",
+      "name": "getFiles",
       "outputs": [
         {
           "components": [
             {
               "internalType": "uint256",
-              "name": "tokenId",
+              "name": "fileId",
               "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Unidocs.File[]",
+          "name": "",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "versionId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string[]",
+              "name": "ipfs",
+              "type": "string[]"
             },
             {
               "internalType": "string",
               "name": "filename",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "checksum",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "mimetype",
               "type": "string"
             },
             {
@@ -148,12 +78,105 @@ export default {
               "type": "uint256"
             },
             {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "mimetype",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "checksum",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Unidocs.FileVersion[][]",
+          "name": "",
+          "type": "tuple[][]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "internalType": "enum Unidocs.Access",
+              "name": "access",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct Unidocs.AccountAccess[][]",
+          "name": "",
+          "type": "tuple[][]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fileId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getfileVersions",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "versionId",
+              "type": "uint256"
+            },
+            {
               "internalType": "string[]",
               "name": "ipfs",
               "type": "string[]"
+            },
+            {
+              "internalType": "string",
+              "name": "filename",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "filesize",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "mimetype",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "checksum",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
             }
           ],
-          "internalType": "struct Unidocs.Document[]",
+          "internalType": "struct Unidocs.FileVersion[]",
           "name": "",
           "type": "tuple[]"
         }
@@ -177,8 +200,54 @@ export default {
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "_fileId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "revokeAccess",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fileId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "enum Unidocs.Access",
+          "name": "_access",
+          "type": "uint8"
+        }
+      ],
+      "name": "shareFile",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "string",
           "name": "_filename",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_description",
           "type": "string"
         },
         {
@@ -200,24 +269,82 @@ export default {
           "internalType": "uint256",
           "name": "_filesize",
           "type": "uint256"
-        }
-      ],
-      "name": "storeDocument",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "total",
-      "outputs": [
+        },
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "_createdAt",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
+      "name": "storeFile",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fileId",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFile",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fileId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_filename",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_description",
+          "type": "string"
+        },
+        {
+          "internalType": "string[]",
+          "name": "_ipfs",
+          "type": "string[]"
+        },
+        {
+          "internalType": "string",
+          "name": "_checksum",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_mimetype",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_filesize",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_createdAt",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateFile",
+      "outputs": [],
+      "stateMutability": "payable",
       "type": "function"
     },
     {

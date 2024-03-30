@@ -1,6 +1,7 @@
-import { cookieStorage, createStorage } from "wagmi";
+import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import { hardhat } from "wagmi/chains";
+import { createClient } from "viem";
 
 const metadata = {
   name: "Unidocs",
@@ -26,3 +27,5 @@ export const wagmiConfig = defaultWagmiConfig({
   enableEIP6963: true,
   enableCoinbase: true,
 });
+
+// wagmiConfig.
