@@ -3,7 +3,7 @@
 pragma solidity >=0.8.2 <0.9.0;
 
 contract Unidocs {
-  struct Version {
+  struct FileVersion {
     uint versionId;
     string[] ipfs;
     string filename;
@@ -14,22 +14,31 @@ contract Unidocs {
     uint createdAt;
   }
 
-  struct Document {
+  struct File {
     uint256 fileId;
     address owner;
-    uint256 totalVersions;
     uint createdAt;
   }
 
-  address public owner;
-  uint256 public totalDocuments = 0;
+  enum Access {
+    WRITE,
+    READ
+  }
 
-  // owner => documents
-  mapping(address => Document[]) private ownerDocuments;
-  // fileId => versions
-  mapping(uint256 => Version[]) private documentVersions;
-  // fileId => owner
-  mapping(uint256 => address) private documentOwners;
+  struct AccountAccess {
+    address account;
+    Access access;
+  }
+
+  address public owner;
+
+  uint256 public fileCount = 0;
+
+  mapping(uint256 => address) private fileOwners;
+  mapping(address => File[]) private ownerFiles;
+  mapping(uint256 => FileVersion[]) private fileVersions;
+  mapping(uint256 => AccountAccess[]) private fileAccess;
+  mapping(address => uint256[]) private accountFiles;
 
   constructor() {
     owner = msg.sender;
@@ -39,22 +48,25 @@ contract Unidocs {
 
   fallback() external payable {}
 
-  function storeDocument(
+  function storeFile(
     string memory _filename,
-    string memory  _description,
+    string memory _description,
     string[] memory _ipfs,
     string memory _checksum,
     string memory _mimetype,
-    uint256 _filesize
+    uint256 _filesize,
+    uint _createdAt
   ) public payable {
-    Document memory document = Document({
-      fileId: totalDocuments,
-      owner: msg.sender,
-      totalVersions: 1,
-      createdAt: _getCurrentTime()
+    address _owner = msg.sender;
+    uint256 fileId = fileCount + 1;
+
+    File memory doc = File({
+      fileId: fileId,
+      owner: _owner,
+      createdAt: _createdAt
     });
 
-    Version memory newVersion = Version({
+    FileVersion memory version = FileVersion({
       versionId: 1,
       filename: _filename,
       description: _description,
@@ -62,92 +74,155 @@ contract Unidocs {
       mimetype: _mimetype,
       filesize: _filesize,
       ipfs: _ipfs,
-      createdAt: _getCurrentTime()
+      createdAt: _createdAt
     });
 
-    ownerDocuments[msg.sender].push(document);
-    documentVersions[totalDocuments].push(newVersion);
-    documentOwners[totalDocuments] = msg.sender;
+    AccountAccess memory access = AccountAccess({
+      account: _owner,
+      access: Access.WRITE
+    });
 
-    totalDocuments++;
+    ownerFiles[_owner].push(doc);
+    fileVersions[fileId].push(version);
+    fileOwners[fileId] = _owner;
+    accountFiles[_owner].push(fileId);
+    fileAccess[fileId].push(access);
+
+    fileCount += 1;
   }
 
-  function updateDocument(
+  function updateFile(
     uint256 _fileId,
     string memory _filename,
     string memory _description,
     string[] memory _ipfs,
     string memory _checksum,
     string memory _mimetype,
-    uint256 _filesize
+    uint256 _filesize,
+    uint _createdAt
   ) public payable {
-    require(documentOwners[_fileId] != address(0), "Document not found");
-    require(documentOwners[_fileId] == msg.sender, "You are not the owner of this document");
+    require(fileOwners[_fileId] != address(0), "File not found");
+    require(_hasAccess(_fileId, msg.sender) == Access.WRITE || fileOwners[_fileId] == msg.sender, "No write permission");
 
-    Version memory newVersion = Version({
-      versionId: ownerDocuments[msg.sender][_fileId].totalVersions + 1,
+    uint256 versionId = fileVersions[_fileId].length + 1;
+
+    FileVersion memory newVersion = FileVersion({
+      versionId: versionId,
       filename: _filename,
       description: _description,
       checksum: _checksum,
       mimetype: _mimetype,
       filesize: _filesize,
       ipfs: _ipfs,
-      createdAt: _getCurrentTime()
+      createdAt: _createdAt
     });
 
-    ownerDocuments[msg.sender][_fileId].totalVersions += 1;
-    documentVersions[_fileId].push(newVersion);
+    fileVersions[_fileId].push(newVersion);
   }
 
-  function transferDocument(address _to, uint256 _fileId) public {
-    require(documentOwners[_fileId] == msg.sender, "You are not the owner of this document");
-    uint256 index = _findDocumentIndexByToken(ownerDocuments[msg.sender], _fileId);
-    require(index < ownerDocuments[msg.sender].length, "Document index out of bounds");
+  function transferFile(address _to, uint256 _fileId) public payable {
+    require(fileOwners[_fileId] != address(0), "File not found");
+    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
+    uint256 index = _findFileIndex(ownerFiles[msg.sender], _fileId);
+    require(index < ownerFiles[msg.sender].length, "Invalid File index");
 
-    Document memory document = ownerDocuments[msg.sender][index];
-    for (uint256 i = index; i < ownerDocuments[msg.sender].length - 1; i++) {
-      ownerDocuments[msg.sender][i] = ownerDocuments[msg.sender][i + 1];
+    File memory doc = ownerFiles[msg.sender][index];
+    ownerFiles[msg.sender][index] = ownerFiles[msg.sender][ownerFiles[msg.sender].length - 1];
+    ownerFiles[msg.sender].pop();
+
+    doc.owner = _to;
+    ownerFiles[_to].push(doc);
+    fileOwners[_fileId] = _to;
+  }
+
+  function shareFile(uint256 _fileId, address _account, Access _access) public payable {
+    require(fileOwners[_fileId] != address(0), "File not found");
+    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
+    require(_account != msg.sender, "Cannot share with owner");
+
+    accountFiles[_account].push(_fileId);
+    AccountAccess memory access = AccountAccess({
+      account: _account,
+      access: _access
+    });
+    fileAccess[_fileId].push(access);
+  }
+
+  function revokeAccess(uint256 _fileId, address _account) public payable {
+    require(fileOwners[_fileId] != address(0), "File not found");
+    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
+    require(_account != msg.sender, "Cannot revoke owner's access");
+
+    uint256 accessIndex = _findAccessIndex(_fileId, _account);
+    require(accessIndex < fileAccess[_fileId].length, "Access not found");
+
+    for (uint256 i = accessIndex; i < fileAccess[_fileId].length - 1; i++) {
+      fileAccess[_fileId][i] = fileAccess[_fileId][i + 1];
     }
-    ownerDocuments[msg.sender].pop();
+    fileAccess[_fileId].pop();
 
-    document.owner = _to;
-    ownerDocuments[_to].push(document);
-    documentOwners[_fileId] = _to;
+    uint256 userAccessIndex = _findUserAccessIndex(_account, _fileId);
+    if (userAccessIndex < accountFiles[_account].length) {
+      for (uint256 j = userAccessIndex; j < accountFiles[_account].length - 1; j++) {
+        accountFiles[_account][j] = accountFiles[_account][j + 1];
+      }
+      accountFiles[_account].pop();
+    }
   }
 
-  function getDocumentVersions(uint256 _fileId) public view returns (Version[] memory) {
-    return documentVersions[_fileId];
+  function getfileVersions(uint256 _fileId) public view returns (FileVersion[] memory) {
+    return fileVersions[_fileId];
   }
 
-  function getDocuments(address _account) public view returns (Document[] memory, Version[][] memory) {
-    Document[] memory documents = ownerDocuments[_account];
-    Version[][] memory versions = new Version[][](documents.length);
+  function getFiles(address _account) public view returns (File[] memory, FileVersion[][] memory, AccountAccess[][] memory) {
+    File[] memory docs = new File[](accountFiles[_account].length);
+    FileVersion[][] memory versions = new FileVersion[][](docs.length);
+    AccountAccess[][] memory accesses = new AccountAccess[][](docs.length);
 
-    for (uint256 i = 0; i < documents.length; i++) {
-      uint256 fileId = documents[i].fileId;
-      versions[i] = documentVersions[fileId];
+    for (uint256 i = 0; i < accountFiles[_account].length; i++) {
+      uint256 fileId = accountFiles[_account][i];
+      uint256 index = _findFileIndex(ownerFiles[fileOwners[fileId]], fileId);
+      docs[i] = ownerFiles[fileOwners[fileId]][index];
+      versions[i] = fileVersions[fileId];
+      accesses[i] = fileAccess[fileId];
     }
 
-    return (documents, versions);
+    return (docs, versions, accesses);
   }
 
-  function getDocument(uint256 _fileId) public view returns (Document memory, Version[] memory) {
-    require(documentOwners[_fileId] != address(0), "Not found");
-    address account = documentOwners[_fileId];
-    uint256 index = _findDocumentIndexByToken(ownerDocuments[account], _fileId);
-    return (ownerDocuments[account][index], documentVersions[_fileId]);
-  }
-
-  function _findDocumentIndexByToken(Document[] memory documents, uint256 _fileId) private pure returns (uint256) {
-    for (uint256 i = 0; i < documents.length; i++) {
-      if (documents[i].fileId == _fileId) {
+  function _findFileIndex(File[] memory docs, uint256 _fileId) private pure returns (uint256) {
+    for (uint256 i = 0; i < docs.length; i++) {
+      if (docs[i].fileId == _fileId) {
         return i;
       }
     }
-    revert("Document not found");
+    revert("File not found");
   }
 
-  function _getCurrentTime() public view returns(uint){
-    return block.timestamp;
+  function _hasAccess(uint256 _fileId, address _account) private view returns (Access) {
+    for (uint i = 0; i < fileAccess[_fileId].length; i++) {
+      if (fileAccess[_fileId][i].account == _account) {
+        return fileAccess[_fileId][i].access;
+      }
+    }
+    revert("No access");
+  }
+
+  function _findAccessIndex(uint256 _fileId, address _account) private view returns (uint256) {
+    for (uint256 i = 0; i < fileAccess[_fileId].length; i++) {
+      if (fileAccess[_fileId][i].account == _account) {
+        return i;
+      }
+    }
+    return fileAccess[_fileId].length;
+  }
+
+  function _findUserAccessIndex(address _account, uint256 _fileId) private view returns (uint256) {
+    for (uint256 i = 0; i < accountFiles[_account].length; i++) {
+      if (accountFiles[_account][i] == _fileId) {
+        return i;
+      }
+    }
+    return accountFiles[_account].length;
   }
 }
