@@ -1,13 +1,13 @@
 import { saveAs } from "file-saver";
-import { UnidocsFile } from "../types";
 import { fromBase64, createFileFromChunks } from "../helpers";
+import { Unidocs } from "../types";
 
-interface DownloadDocumentProps {
-  file: UnidocsFile;
+interface DownloadFileProps {
+  file: Unidocs.File;
 }
 
-const useDownloadDocument = () => {
-  const downloadDocument = async ({ file }: DownloadDocumentProps) => {
+const useDownloadFile = () => {
+  const downloadFile = async ({ file }: DownloadFileProps) => {
     const base64 = await createFileFromChunks(file.currentVersion.ipfs);
     saveAs(
       fromBase64(
@@ -18,7 +18,7 @@ const useDownloadDocument = () => {
     );
   };
 
-  return { downloadDocument };
+  return { downloadFile };
 };
 
-export { useDownloadDocument };
+export { useDownloadFile };

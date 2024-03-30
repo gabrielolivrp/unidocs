@@ -1,18 +1,18 @@
-import { useUpdateDocumentVersion } from "./useUpdateDocumentVersion";
-import { UnidocsFile } from "../types";
+import { Unidocs } from "../types";
+import { useUpdateFileVersion } from "./useUpdateFileVersion";
 
-interface UpdateDescriptionProps {
-  file: UnidocsFile;
+interface UpdateFileDescriptionProps {
+  file: Unidocs.File;
   description: string;
 }
 
-const useUpdateDocumentDescription = () => {
-  const { updateVersion } = useUpdateDocumentVersion();
+const useUpdateFileDescription = () => {
+  const { updateVersion } = useUpdateFileVersion();
 
   const updateDescription = async ({
     file,
     description,
-  }: UpdateDescriptionProps) =>
+  }: UpdateFileDescriptionProps) =>
     updateVersion({
       fileId: file.fileId,
       filename: file.currentVersion.filename,
@@ -26,4 +26,4 @@ const useUpdateDocumentDescription = () => {
   return { updateDescription };
 };
 
-export { useUpdateDocumentDescription };
+export { useUpdateFileDescription };

@@ -9,24 +9,32 @@ interface StoreProps {
   description: string;
 }
 
-const useStoreDocument = () => {
+const useStoreFile = () => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
-  const storeDocument = async ({ file, filename, description }: StoreProps) => {
+  const storeFile_ = async ({ file, filename, description }: StoreProps) => {
     const mimetype = file.type;
     const filesize = BigInt(file.size);
     const checksum = await generateChecksum(file);
     const ipfs = await storeFile(file);
-
+    const createdAt = BigInt(Date.now());
     return writeContractAsync({
       ...unidocs,
-      functionName: "storeDocument",
-      args: [filename, description, ipfs, checksum, mimetype, filesize],
+      functionName: "storeFile",
+      args: [
+        filename,
+        description,
+        ipfs,
+        checksum,
+        mimetype,
+        filesize,
+        createdAt,
+      ],
     });
   };
 
-  return { storeDocument };
+  return { storeFile: storeFile_ };
 };
 
-export { useStoreDocument };
+export { useStoreFile };

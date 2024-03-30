@@ -1,7 +1,7 @@
 import { useWriteContract } from "wagmi";
 import { getContract } from "../helpers/getContracts";
 
-interface UpdateVersionProps {
+interface UpdateFileVersionProps {
   fileId: bigint;
   filename: string;
   description: string;
@@ -11,7 +11,7 @@ interface UpdateVersionProps {
   filesize: bigint;
 }
 
-const useUpdateDocumentVersion = () => {
+const useUpdateFileVersion = () => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
@@ -23,15 +23,25 @@ const useUpdateDocumentVersion = () => {
     checksum,
     mimetype,
     filesize,
-  }: UpdateVersionProps) => {
+  }: UpdateFileVersionProps) => {
+    const createdAt = BigInt(Date.now());
     return writeContractAsync({
       ...unidocs,
-      functionName: "updateDocument",
-      args: [fileId, filename, description, ipfs, checksum, mimetype, filesize],
+      functionName: "updateFile",
+      args: [
+        fileId,
+        filename,
+        description,
+        ipfs,
+        checksum,
+        mimetype,
+        filesize,
+        createdAt,
+      ],
     });
   };
 
   return { updateVersion };
 };
 
-export { useUpdateDocumentVersion };
+export { useUpdateFileVersion };

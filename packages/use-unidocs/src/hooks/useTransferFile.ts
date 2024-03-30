@@ -1,26 +1,26 @@
 import { useWriteContract } from "wagmi";
 import { Address } from "viem";
 import { getContract } from "../helpers/getContracts";
-import { UnidocsFile } from "../types";
+import { Unidocs } from "../types";
 
-interface TransferDocumentProps {
-  file: UnidocsFile;
+interface TransferFileProps {
+  file: Unidocs.File;
   account: Address;
 }
 
-const useTransferDocument = () => {
+const useTransferFile = () => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
-  const transferDocument = async ({ file, account }: TransferDocumentProps) => {
+  const transferFile = async ({ file, account }: TransferFileProps) => {
     return writeContractAsync({
       ...unidocs,
-      functionName: "transferDocument",
+      functionName: "transferFile",
       args: [account, file.fileId],
     });
   };
 
-  return { transferDocument };
+  return { transferFile };
 };
 
-export { useTransferDocument };
+export { useTransferFile };

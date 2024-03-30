@@ -1,19 +1,30 @@
-export type Version = {
-  versionId: bigint;
-  filename: string;
-  description: string;
-  checksum: string;
-  filesize: bigint;
-  mimetype: string;
-  createdAt: Date;
-  ipfs: string[];
-};
+import { Address } from "viem";
 
-export type UnidocsFile = {
-  createdAt: Date;
-  owner: string;
-  fileId: bigint;
-  totalVersions: bigint;
-  versions: Version[];
-  currentVersion: Version;
-};
+export namespace Unidocs {
+  export type Access = "WRITE" | "READ";
+
+  export interface AccountAccess {
+    account: Address;
+    access: Access;
+  }
+
+  export interface Version {
+    versionId: bigint;
+    filename: string;
+    description: string;
+    checksum: string;
+    filesize: bigint;
+    mimetype: string;
+    createdAt: Date;
+    ipfs: string[];
+  }
+
+  export interface File {
+    createdAt: Date;
+    owner: string;
+    fileId: bigint;
+    versions: Version[];
+    permissions: AccountAccess[];
+    currentVersion: Version;
+  }
+}
