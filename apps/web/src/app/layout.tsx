@@ -25,7 +25,7 @@ const RootLayout = ({
 
   return (
     <html suppressHydrationWarning lang="en">
-      <body className="min-h-screen bg-background antialiased overflow-x-hidden">
+      <body className="min-h-screen bg-muted/40 antialiased overflow-x-hidden">
         <Web3ModalProvider initialState={initialState}>
           <Providers>{children}</Providers>
         </Web3ModalProvider>
