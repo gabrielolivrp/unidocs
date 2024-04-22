@@ -22,7 +22,7 @@ const icon = (mimetype: string): Icons => {
 };
 
 const FileIcon = ({ mimetype, size }: FileIconProps) => (
-  <Icon name={icon(mimetype)} size={size} strokeWidth={0.5} />
+  <Icon strokeWidth={1} name={icon(mimetype)} size={size} />
 );
 
 export { FileIcon };
