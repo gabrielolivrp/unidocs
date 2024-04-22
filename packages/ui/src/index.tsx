@@ -19,3 +19,4 @@ export * from "./avatar";
 export * from "./form-label";
 export * from "./form-message";
 export * from "./select";
+export * from "./tooltip";
