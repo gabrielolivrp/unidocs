@@ -51,7 +51,7 @@ const Th = React.forwardRef<
 const Tr = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => <tr ref={ref} {...props} />);
+>(({ ...props }, ref) => <tr ref={ref} {...props} />);
 
 const Td = React.forwardRef<
   HTMLTableColElement,
