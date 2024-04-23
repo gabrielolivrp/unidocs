@@ -15,6 +15,7 @@ import { UpdateFileDescriptionDialog } from "./update-file-description-dialog";
 import { Hash } from "./hash";
 import { Unidocs } from "@unidocs/use-unidocs";
 import { useAccount } from "wagmi";
+import { AccountAvatar } from "./account-avatar";
 
 interface FileInfoDialogProps {
   file: Unidocs.File;
@@ -68,13 +69,18 @@ const FileInfoDialog = ({
             <div>
               <Typography variant="h5">Information</Typography>
               <div className="grid gap-4 divide-y">
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <Typography variant="p" className="text-muted-foreground">
                     Owner
                   </Typography>
-                  <Hash text={file.owner} />
+                  <div className="flex items-center justify-center space-x-2">
+                    <label>
+                    {file.owner === address ? "me" : <Hash text={file.owner} />}
+                    </label>
+                    <AccountAvatar address={file.owner} />
+                  </div>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <Typography variant="p" className="text-muted-foreground">
                     Type
                   </Typography>
@@ -88,7 +94,7 @@ const FileInfoDialog = ({
                   </Typography>
                   <Hash text={file.currentVersion.checksum} />
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <Typography variant="p" className="text-muted-foreground">
                     Created at
                   </Typography>
@@ -96,7 +102,7 @@ const FileInfoDialog = ({
                     {file.createdAt.toLocaleString()}
                   </Typography>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <Typography variant="p" className="text-muted-foreground">
                     Updated at
                   </Typography>
