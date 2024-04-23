@@ -9,6 +9,10 @@ import { TransferFile } from "./transfer-file-dialog";
 import { ShareFileDialog } from "./share-file-dialog";
 import {
   Badge,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -25,7 +29,7 @@ import {
 import Image from "next/image";
 import Empty from "@/assets/empty.svg";
 import { actions, FileActionEvent } from "@/constants/file-actions";
-import { formatBytes } from "@/helpers";
+import { formatBytes, hasPermissions } from "@/helpers";
 import { Hash } from "./hash";
 import { FileIcon } from "./file-icon";
 import { AccountAvatar } from "./account-avatar";
@@ -117,54 +121,79 @@ const Files = ({ layout }: FilesProps) => {
           </THead>
           <TBody>
             {files?.map((file, index) => (
-              <Tr key={index} className="hover:bg-muted/95 border-b">
-                <Td>
-                  <div className="flex items-center space-x-2">
-                    <FileIcon
-                      mimetype={file.currentVersion.mimetype}
-                      size="2rem"
-                    />
-                    <Typography as="p" variant="p">
-                      {file.currentVersion.filename}
-                    </Typography>
-                  </div>
-                </Td>
-                <Td>
-                  <div className="flex items-center space-x-2">
-                    <AccountAvatar address={file.owner} />
-                    <Typography as="p" variant="p">
-                      {file.owner === address ? (
-                        "me"
-                      ) : (
-                        <Hash text={file.owner} />
-                      )}
-                    </Typography>
-                  </div>
-                </Td>
-                <Td>{file.currentVersion.createdAt.toLocaleString()}</Td>
-                <Td>
-                  <Badge>
-                    {formatBytes(Number(file.currentVersion.filesize))}
-                  </Badge>
-                </Td>
-                <Td>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Icon name="MoreVertical"></Icon>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {actions.map(({ name, event }, index) => (
-                        <DropdownMenuItem
+              <ContextMenu>
+                <ContextMenuTrigger asChild>
+                  <Tr key={index} className="hover:bg-muted/95 border-b">
+                    <Td>
+                      <div className="flex items-center space-x-2">
+                        <FileIcon
+                          mimetype={file.currentVersion.mimetype}
+                          size="2rem"
+                        />
+                        <Typography as="p" variant="p">
+                          {file.currentVersion.filename}
+                        </Typography>
+                      </div>
+                    </Td>
+                    <Td>
+                      <div className="flex items-center space-x-2">
+                        <AccountAvatar address={file.owner} />
+                        <Typography as="p" variant="p">
+                          {file.owner === address ? (
+                            "me"
+                          ) : (
+                            <Hash text={file.owner} />
+                          )}
+                        </Typography>
+                      </div>
+                    </Td>
+                    <Td>{file.currentVersion.createdAt.toLocaleString()}</Td>
+                    <Td>
+                      <Badge>
+                        {formatBytes(Number(file.currentVersion.filesize))}
+                      </Badge>
+                    </Td>
+                    <Td>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Icon name="MoreVertical"></Icon>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {actions.map(
+                            ({ name, event, permissions, owned }, index) =>
+                              hasPermissions(
+                                file,
+                                permissions,
+                                address,
+                                owned
+                              ) && (
+                                <DropdownMenuItem
+                                  key={index}
+                                  onClick={() => onAction(file)(event)}
+                                >
+                                  {name}
+                                </DropdownMenuItem>
+                              )
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </Td>
+                  </Tr>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  {actions.map(
+                    ({ name, event, permissions, owned }, index) =>
+                      hasPermissions(file, permissions, address, owned) && (
+                        <ContextMenuItem
                           key={index}
                           onClick={() => onAction(file)(event)}
                         >
                           {name}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </Td>
-              </Tr>
+                        </ContextMenuItem>
+                      )
+                  )}
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </TBody>
         </Table>
