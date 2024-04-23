@@ -61,5 +61,6 @@
 
 :root {
   --wui-color-modal-bg: hsl(var(--background)) !important;
-  --wui-cover: rgb(0 0 0 / 0.8) !important;
+  --wui-cover: rgb(0 0 0 / 0.3) !important;
+  --wui-border-radius-l: 1rem !important;
 }
