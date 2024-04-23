@@ -3,7 +3,7 @@ import { Address } from "viem";
 import { getContract } from "../helpers/getContracts";
 import { Unidocs } from "../types";
 
-interface TransferFileProps {
+export interface TransferFileProps {
   file: Unidocs.File;
   account: Address;
 }

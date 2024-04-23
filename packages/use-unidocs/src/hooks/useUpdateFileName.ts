@@ -1,7 +1,7 @@
 import { Unidocs } from "../types";
 import { useUpdateFileVersion } from "./useUpdateFileVersion";
 
-interface UpdateFileNameProps {
+export interface UpdateFileNameProps {
   file: Unidocs.File;
   filename: string;
 }

@@ -17,3 +17,5 @@ export * from "./update-file-description-dialog";
 export * from "./update-file";
 export * from "./upload-file";
 export * from "./wallet-button";
+export * from "./transfer-file-dialog";
+export * from "./share-file-dialog";

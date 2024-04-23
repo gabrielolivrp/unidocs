@@ -1,15 +1,41 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { useGetFiles, useDownloadFile, Unidocs } from "@unidocs/use-unidocs";
+import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
 import { FileVersionHistoryDialog } from "./file-version-history-dialog";
 import { FileInfoDialog } from "./file-info-dialog";
 import { FileCard } from "./file-card";
 import { UpdateFile } from "./update-file";
 import { TransferFile } from "./transfer-file-dialog";
 import { ShareFileDialog } from "./share-file-dialog";
+import {
+  Badge,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Icon,
+  Table,
+  TBody,
+  Td,
+  Th,
+  THead,
+  Tr,
+  Typography,
+} from "@unidocs/ui";
+import Image from "next/image";
+import Empty from "@/assets/empty.svg";
+import { actions, FileActionEvent } from "@/constants/file-actions";
+import { formatBytes } from "@/helpers";
+import { Hash } from "./hash";
+import { FileIcon } from "./file-icon";
+import { AccountAvatar } from "./account-avatar";
 
-const Files = () => {
-  const { address, isConnected } = useAccount();
+interface FilesProps {
+  layout: "list" | "grid";
+}
+
+const Files = ({ layout }: FilesProps) => {
+  const { address } = useAccount();
   const [file, setFile] = useState<Unidocs.File | null>(null);
   const [fileInfoDialog, setFileInfoDialog] = useState(false);
   const [fileVersionHistoryDialog, setFileVersionHistoryDialog] =
@@ -18,8 +44,7 @@ const Files = () => {
   const [transferFileDialog, setTransferFileDialog] = useState(false);
   const [shareFileDialog, setShareFileDialog] = useState(false);
 
-  const { files } = useGetFiles({ account: address! });
-  const { downloadFile } = useDownloadFile();
+  const { files, downloadFile } = useUnidocs();
 
   const handlePreview = async (file: Unidocs.File) => {};
 
@@ -50,7 +75,7 @@ const Files = () => {
     setShareFileDialog(true);
   };
 
-  const onAction = (file: Unidocs.File) => (event: string) => {
+  const onAction = (file: Unidocs.File) => (event: FileActionEvent) => {
     switch (event) {
       case "view":
         return handlePreview(file);
@@ -71,16 +96,95 @@ const Files = () => {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-6 gap-4">
-        {files?.map((file, index) => (
-          <FileCard key={index} onAction={onAction(file)} file={file} />
-        ))}
-        {!isConnected && (
-          <>
-            <p>Connecte sua carteira</p>
-          </>
-        )}
-      </div>
+      {layout === "grid" && files.length > 0 && (
+        <div className="grid grid-cols-6 gap-4">
+          {files?.map((file, index) => (
+            <FileCard key={index} onAction={onAction(file)} file={file} />
+          ))}
+        </div>
+      )}
+
+      {layout === "list" && files.length > 0 && (
+        <Table className="table-auto">
+          <THead>
+            <Tr>
+              <Th>Name</Th>
+              <Th>Owner</Th>
+              <Th>Updated at</Th>
+              <Th>Size</Th>
+              <Th></Th>
+            </Tr>
+          </THead>
+          <TBody>
+            {files?.map((file, index) => (
+              <Tr key={index} className="hover:bg-muted/95 border-b">
+                <Td>
+                  <div className="flex items-center space-x-2">
+                    <FileIcon
+                      mimetype={file.currentVersion.mimetype}
+                      size="2rem"
+                    />
+                    <Typography as="p" variant="p">
+                      {file.currentVersion.filename}
+                    </Typography>
+                  </div>
+                </Td>
+                <Td>
+                  <div className="flex items-center space-x-2">
+                    <AccountAvatar address={file.owner} />
+                    <Typography as="p" variant="p">
+                      {file.owner === address ? (
+                        "me"
+                      ) : (
+                        <Hash text={file.owner} />
+                      )}
+                    </Typography>
+                  </div>
+                </Td>
+                <Td>{file.currentVersion.createdAt.toLocaleString()}</Td>
+                <Td>
+                  <Badge>
+                    {formatBytes(Number(file.currentVersion.filesize))}
+                  </Badge>
+                </Td>
+                <Td>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Icon name="MoreVertical"></Icon>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {actions.map(({ name, event }, index) => (
+                        <DropdownMenuItem
+                          key={index}
+                          onClick={() => onAction(file)(event)}
+                        >
+                          {name}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Td>
+              </Tr>
+            ))}
+          </TBody>
+        </Table>
+      )}
+
+      {files.length === 0 && (
+        <div className="flex flex-col items-center justify-center">
+          <div className="w-60 h-44">
+            <Image
+              src={Empty}
+              alt="Empty"
+              object-fit="cover"
+              style={{ width: "100%", height: "100%" }}
+            />
+          </div>
+          <Typography as="h3" variant="lead">
+            Upload your first file
+          </Typography>
+        </div>
+      )}
 
       {file && (
         <>

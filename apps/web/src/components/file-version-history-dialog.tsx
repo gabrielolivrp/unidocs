@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@unidocs/ui";
 import { FileIcon } from "./file-icon";
-import { Unidocs, useDownloadFile } from "@unidocs/use-unidocs";
+import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
 import { useState } from "react";
 import { FileInfoDialog } from "./file-info-dialog";
 
@@ -28,7 +28,7 @@ const FileVersionHistoryDialog = ({
   open,
   onOpenChange,
 }: FileVersionHistoryDialogProps) => {
-  const { downloadFile } = useDownloadFile();
+  const { downloadFile } = useUnidocs();
   const [fileDialog, setFileDialog] = useState(file);
   const [fileInfoDialog, setFileInfoDialog] = useState(false);
 

@@ -3,7 +3,7 @@ import { getContract } from "../helpers/getContracts";
 import { Address } from "viem";
 import { Unidocs } from "../types";
 
-interface ShareFileProps {
+export interface ShareFileProps {
   fileId: bigint;
   account: Address;
   access: Unidocs.Access;

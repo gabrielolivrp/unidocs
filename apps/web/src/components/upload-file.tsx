@@ -11,9 +11,8 @@ import {
   SheetContent,
   SheetFooter,
 } from "@unidocs/ui";
-import { useStoreFile } from "@unidocs/use-unidocs";
+import { useUnidocs } from "@unidocs/use-unidocs";
 import { useTransactor } from "@/hooks";
-import { useAlert, useLoading } from "@/contexts";
 import { Dropzone } from "./dropzone";
 import { ConfirmTxDialog } from "./confirm-tx-dialog";
 
@@ -27,7 +26,7 @@ const UploadFile = ({ open, onOpenChange }: UploadFileProps) => {
   const [description, setDescription] = useState("");
   const [filename, setFilename] = useState("");
   const [confirmTxDialog, setConfirmTxDialog] = useState(false);
-  const { storeFile } = useStoreFile();
+  const { storeFile } = useUnidocs();
 
   const writeTx = useTransactor({
     onStart: () => {

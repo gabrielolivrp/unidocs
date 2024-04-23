@@ -15,57 +15,11 @@ import { FileIcon } from "./file-icon";
 import { formatBytes, hasPermissions } from "@/helpers";
 import { Unidocs } from "@unidocs/use-unidocs";
 import { useAccount } from "wagmi";
-
-interface Action {
-  name: string;
-  event: string;
-  permissions: Unidocs.Access[];
-  owned?: boolean;
-}
-
-const actions = [
-  {
-    name: "Download",
-    event: "download",
-    permissions: ["READ", "WRITE"],
-  },
-  {
-    name: "File Information",
-    event: "file_info",
-    permissions: ["READ", "WRITE"],
-  },
-  {
-    name: "Update file",
-    event: "update_file",
-    permissions: ["WRITE"],
-  },
-  {
-    name: "Transfer",
-    event: "transfer",
-    owned: true,
-    permissions: [],
-  },
-  {
-    name: "Version History",
-    event: "version_history",
-    permissions: ["READ", "WRITE"],
-  },
-  {
-    name: "Open",
-    event: "view",
-    permissions: ["READ", "WRITE"],
-  },
-  {
-    name: "Share",
-    event: "share",
-    owned: true,
-    permissions: [],
-  },
-] as Action[];
+import { actions, FileActionEvent } from "@/constants/file-actions";
 
 interface FileCardProps {
   file: Unidocs.File;
-  onAction: (e: string) => void;
+  onAction: (e: FileActionEvent) => void;
 }
 
 const FileCard = ({ file, onAction }: FileCardProps) => {
@@ -73,7 +27,7 @@ const FileCard = ({ file, onAction }: FileCardProps) => {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div className="transition-all group/item border p-3 rounded-2xl relative hover:bg-primary-foreground">
+        <div className="w-100 flex justify-center items-center transition-all group/item border p-3 rounded-2xl relative bg-muted/95">
           <div className="group-hover/item:visible invisible absolute top-1 left-1">
             <Badge>{formatBytes(Number(file.currentVersion.filesize))}</Badge>
           </div>
@@ -110,4 +64,5 @@ const FileCard = ({ file, onAction }: FileCardProps) => {
     </ContextMenu>
   );
 };
+
 export { FileCard };

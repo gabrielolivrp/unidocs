@@ -1,7 +1,7 @@
 import { Unidocs } from "../types";
 import { useUpdateFileVersion } from "./useUpdateFileVersion";
 
-interface UpdateFileDescriptionProps {
+export interface UpdateFileDescriptionProps {
   file: Unidocs.File;
   description: string;
 }
@@ -9,7 +9,7 @@ interface UpdateFileDescriptionProps {
 const useUpdateFileDescription = () => {
   const { updateVersion } = useUpdateFileVersion();
 
-  const updateDescription = async ({
+  const updateFileDescription = async ({
     file,
     description,
   }: UpdateFileDescriptionProps) =>
@@ -23,7 +23,7 @@ const useUpdateFileDescription = () => {
       description,
     });
 
-  return { updateDescription };
+  return { updateFileDescription };
 };
 
 export { useUpdateFileDescription };

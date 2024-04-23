@@ -23,53 +23,61 @@ type AccountAccess = Omit<Unidocs.AccountAccess, "access"> & {
   access: number;
 };
 
+const mapFile = (
+  file: File,
+  access: AccountAccess[],
+  versions: Version[]
+): Unidocs.File => {
+  const versions2 = versions.map((version) => ({
+    ...version,
+    createdAt: new Date(Number(version.createdAt)),
+  }));
+  const currentVersion = versions2[versions.length - 1];
+  return {
+    ...file,
+    currentVersion,
+    versions: versions2,
+    permissions: access.map((a) => ({
+      ...a,
+      access: a.access === 0 ? "WRITE" : "READ",
+    })),
+    createdAt: new Date(Number(file.createdAt)),
+  };
+};
+
 const useGetFiles = ({ account }: useGetFilesProps) => {
   const unidocs = getContract("Unidocs");
   const [files, setFiles] = useState<Unidocs.File[]>([]);
+  const [data, setData] = useState([[], [], []]);
 
   const {
     data: result,
     refetch,
-    isFetched,
+    isFetched
   } = useReadContract({
     ...unidocs,
     functionName: "getFiles",
     args: [account],
   });
 
-  const makeFileWithVersions = (
-    file: File,
-    access: AccountAccess[],
-    versions: Version[]
-  ): Unidocs.File => {
-    const versions2 = versions.map((version) => ({
-      ...version,
-      createdAt: new Date(Number(version.createdAt)),
-    }));
-    const currentVersion = versions2[versions.length - 1];
-    return {
-      ...file,
-      currentVersion,
-      versions: versions2,
-      permissions: access.map((a) => ({
-        ...a,
-        access: a.access === 0 ? "WRITE" : "READ",
-      })),
-      createdAt: new Date(Number(file.createdAt)),
-    };
-  };
-
-  const refetch_ = () => refetch();
-
   useEffect(() => {
     if (isFetched && result) {
-      const [files, versions, access] = result;
-      const updatedFiles = files.map((file, index) =>
-        makeFileWithVersions(file, access[index] as any, versions[index] as any)
-      );
-      setFiles(updatedFiles);
+      setData(result as any);
     }
-  }, [isFetched]);
+  }, [isFetched, result]);
+
+  const refetch_ = async () => {
+    const { data: result } = await refetch();
+    setData(result as any);
+  };
+
+  useEffect(() => {
+    const [files_, versions, access] = data;
+    const updatedFiles = (files_ ?? []).map((file: any, index: any) =>
+      mapFile(file, access[index], versions[index])
+    );
+    setFiles(updatedFiles);
+  }, [data]);
 
   return { files, refetch: refetch_ };
 };

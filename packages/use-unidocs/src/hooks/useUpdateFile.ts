@@ -3,7 +3,7 @@ import { generateChecksum } from "../helpers";
 import { storeFile } from "../helpers/storeFile";
 import { Unidocs } from "../types";
 
-interface UpdateFileProps {
+export interface UpdateFileProps {
   file: Unidocs.File;
   nodeFile: File;
 }

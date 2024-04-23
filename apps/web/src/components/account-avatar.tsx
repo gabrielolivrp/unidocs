@@ -2,7 +2,7 @@ import { Address } from "viem";
 import { Avatar, AvatarFallback, AvatarImage } from "@unidocs/ui";
 
 interface AccountAvatarProps {
-  address: Address;
+  address: Address | string;
 }
 
 const AccountAvatar = ({ address }: AccountAvatarProps) => {

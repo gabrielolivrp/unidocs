@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { Address, isAddress } from "viem";
+import { isAddress } from "viem";
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -13,7 +13,7 @@ import {
   Input,
   FormMessage,
 } from "@unidocs/ui";
-import { Unidocs, useTransferFile } from "@unidocs/use-unidocs";
+import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
 import { useTransactor } from "@/hooks";
 
 interface TransferFileProps {
@@ -34,7 +34,7 @@ const TransferFile = ({ file, open, onOpenChange }: TransferFileProps) => {
       onOpenChange(false);
     },
   });
-  const { transferFile } = useTransferFile();
+  const { transferFile } = useUnidocs();
 
   useEffect(() => setFormError(""), [account]);
 
@@ -47,7 +47,7 @@ const TransferFile = ({ file, open, onOpenChange }: TransferFileProps) => {
     return writeTx(() =>
       transferFile({
         file,
-        account: account as Address,
+        account,
       })
     );
   };

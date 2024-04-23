@@ -2,7 +2,7 @@ import { useWriteContract } from "wagmi";
 import { getContract } from "../helpers/getContracts";
 import { Address } from "viem";
 
-interface StoreProps {
+export interface RevokeAccessProps {
   fileId: bigint;
   account: Address;
 }
@@ -11,7 +11,7 @@ const useRevokeAccess = () => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
-  const revokeAccess = async ({ fileId, account }: StoreProps) =>
+  const revokeAccess = async ({ fileId, account }: RevokeAccessProps) =>
     writeContractAsync({
       ...unidocs,
       functionName: "revokeAccess",

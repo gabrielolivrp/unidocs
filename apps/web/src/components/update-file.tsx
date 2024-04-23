@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   FormItem,
@@ -10,7 +10,7 @@ import {
   SheetFooter,
   FormLabel,
 } from "@unidocs/ui";
-import { Unidocs, useUpdateFile } from "@unidocs/use-unidocs";
+import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
 import { useTransactor } from "@/hooks";
 import { ConfirmTxDialog } from "./confirm-tx-dialog";
 import { Dropzone } from "./dropzone";
@@ -25,7 +25,7 @@ const UpdateFile = ({ file, open, onOpenChange }: UpdateFileProps) => {
   const [nodeFile, setNodeFile] = useState<File | null>(null);
   const [confirmTxDialog, setConfirmTxDialog] = useState(false);
 
-  const { updateFile } = useUpdateFile();
+  const { updateFile } = useUnidocs();
 
   const writeTx = useTransactor({
     onStart: () => {

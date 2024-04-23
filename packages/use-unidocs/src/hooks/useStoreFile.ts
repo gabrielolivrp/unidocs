@@ -3,7 +3,7 @@ import { getContract } from "../helpers/getContracts";
 import { generateChecksum } from "../helpers/generateChecksum";
 import { storeFile } from "../helpers/storeFile";
 
-interface StoreProps {
+export interface StoreFileProps {
   file: File;
   filename: string;
   description: string;
@@ -13,7 +13,11 @@ const useStoreFile = () => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
-  const storeFile_ = async ({ file, filename, description }: StoreProps) => {
+  const storeFile_ = async ({
+    file,
+    filename,
+    description,
+  }: StoreFileProps) => {
     const mimetype = file.type;
     const filesize = BigInt(file.size);
     const checksum = await generateChecksum(file);

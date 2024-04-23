@@ -2,7 +2,7 @@ import { saveAs } from "file-saver";
 import { fromBase64, createFileFromChunks } from "../helpers";
 import { Unidocs } from "../types";
 
-interface DownloadFileProps {
+export interface DownloadFileProps {
   file: Unidocs.File;
 }
 

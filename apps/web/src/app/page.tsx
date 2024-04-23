@@ -1,14 +1,69 @@
 "use client";
 
-import { Button, Typography } from "@unidocs/ui";
+import {
+  Button,
+  Icon,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  Typography,
+} from "@unidocs/ui";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Header, Footer, Files, UploadFile } from "@/components";
 import { useIsMounted } from "@/hooks";
 
+interface ToggleLayoutProps {
+  layout: "list" | "grid";
+  onChange: (layout: "list" | "grid") => void;
+}
+
+const ToggleLayout = ({ layout, onChange }: ToggleLayoutProps) => (
+  <div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={() => onChange("grid")}
+            className={`rounded-l-full ${
+              layout === "grid" ? "bg-muted/95" : ""
+            }`}
+            variant="outline"
+          >
+            <Icon name="LayoutGrid" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Grid</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={() => onChange("list")}
+            className={`rounded-r-full ${
+              layout === "list" ? "bg-muted/95" : ""
+            }`}
+            variant="outline"
+          >
+            <Icon name="LayoutList" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>List</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  </div>
+);
+
 const Home = () => {
   const { isConnected } = useAccount();
-  const [open, setOpen] = useState(false);
+  const [layout, setLayout] = useState<"list" | "grid">("grid");
+  const [uploadFileDialog, setUploadFileDialog] = useState(false);
 
   const isMounted = useIsMounted();
   if (!isMounted) return null;
@@ -19,16 +74,21 @@ const Home = () => {
         <Header />
         <div className="container flex-1 space-y-8">
           <div className="flex items-center justify-between">
-            <Typography variant="h4">Files</Typography>
-            <Button disabled={!isConnected} onClick={() => setOpen(true)}>
-              Upload
-            </Button>
+            <ToggleLayout layout={layout} onChange={setLayout} />
+            <div>
+              <Button
+                disabled={!isConnected}
+                onClick={() => setUploadFileDialog(true)}
+              >
+                Upload
+              </Button>
+            </div>
           </div>
-          <Files />
+          <Files layout={layout} />
         </div>
         <Footer />
       </div>
-      <UploadFile open={open} onOpenChange={setOpen} />
+      <UploadFile open={uploadFileDialog} onOpenChange={setUploadFileDialog} />
     </>
   );
 };

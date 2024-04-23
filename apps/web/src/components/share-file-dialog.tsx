@@ -1,4 +1,6 @@
-import { formatBytes } from "@/helpers";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAccount } from "wagmi";
 import {
   Badge,
   Button,
@@ -21,14 +23,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@unidocs/ui";
-import { useEffect, useState } from "react";
+import { formatBytes } from "@/helpers";
 import { Hash } from "./hash";
 import { AccountAvatar } from "./account-avatar";
-import { Unidocs, useRevokeAccess, useShareFile } from "@unidocs/use-unidocs";
+import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
 import { Address, isAddress } from "viem";
 import { useTransactor } from "@/hooks";
-import { toast } from "sonner";
-import { useAccount } from "wagmi";
 
 interface ShareFileDialogProps {
   file: Unidocs.File;
@@ -54,8 +54,7 @@ const ShareFileDialog = ({
     },
   });
   const { address } = useAccount();
-  const { shareFile } = useShareFile();
-  const { revokeAccess } = useRevokeAccess();
+  const { shareFile, revokeAccess } = useUnidocs();
 
   useEffect(() => setFormError(""), [account]);
 

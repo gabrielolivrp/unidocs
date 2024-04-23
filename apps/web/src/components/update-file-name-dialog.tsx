@@ -12,8 +12,7 @@ import {
   FormMessage,
   Input,
 } from "@unidocs/ui";
-import { Unidocs, useUpdateFileName } from "@unidocs/use-unidocs";
-import { useLoading } from "@/contexts";
+import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
 import { useTransactor } from "@/hooks";
 
 interface UpdateFileNameDialogProps {
@@ -29,9 +28,6 @@ const UpdateFileNameDialog = ({
 }: UpdateFileNameDialogProps) => {
   const [filename, setFilename] = useState(file.currentVersion.filename);
   const [formError, setFormError] = useState("");
-  const { startLoading, finishLoading } = useLoading({
-    message: "Confirming transaction",
-  });
   const writeTx = useTransactor({
     onError: (err) => {
       toast(err);
@@ -41,7 +37,7 @@ const UpdateFileNameDialog = ({
       onOpenChange(false);
     },
   });
-  const { updateFileName } = useUpdateFileName();
+  const { updateFileName } = useUnidocs();
 
   useEffect(() => setFormError(""), [filename]);
 
