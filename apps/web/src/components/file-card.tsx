@@ -37,11 +37,17 @@ const FileCard = ({ file, onAction }: FileCardProps) => {
                 <Icon name="MoreVertical"></Icon>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {actions.map(({ name, event }, index) => (
-                  <DropdownMenuItem key={index} onClick={() => onAction(event)}>
-                    {name}
-                  </DropdownMenuItem>
-                ))}
+                {actions.map(
+                  ({ name, event, permissions, owned }, index) =>
+                    hasPermissions(file, permissions, address, owned) && (
+                      <DropdownMenuItem
+                        key={index}
+                        onClick={() => onAction(event)}
+                      >
+                        {name}
+                      </DropdownMenuItem>
+                    )
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
