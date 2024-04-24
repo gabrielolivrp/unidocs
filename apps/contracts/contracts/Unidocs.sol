@@ -41,6 +41,13 @@ contract Unidocs {
   mapping(uint256 => AccountAccess[]) private fileAccess;
   mapping(address => uint256[]) private accountFiles;
 
+
+  event FileCreated(uint256 indexed fileId, address indexed owner);
+  event FileUpdated(uint256 indexed fileId, address indexed owner);
+  event FileTransferred(uint256 indexed fileId, address indexed previousOwner, address indexed newOwner);
+  event FileAccessShared(uint256 indexed fileId, address indexed owner, address indexed account, Unidocs.Access access);
+  event FileAccessRevoked(uint256 indexed fileId, address indexed owner, address indexed account);
+
   constructor() {
     owner = msg.sender;
   }
@@ -91,6 +98,8 @@ contract Unidocs {
     fileAccess[fileId].push(access);
 
     fileCount += 1;
+
+    emit FileCreated(fileId, _owner);
   }
 
   function updateFile(
@@ -121,6 +130,8 @@ contract Unidocs {
     });
 
     fileVersions[_fileId].push(newVersion);
+
+    emit FileUpdated(_fileId, msg.sender);
   }
 
   function transferFile(address _to, uint256 _fileId) public payable {
@@ -129,13 +140,15 @@ contract Unidocs {
     uint256 index = _findFileIndex(ownerFiles[msg.sender], _fileId);
     require(index < ownerFiles[msg.sender].length, "Invalid File index");
 
-    File memory doc = ownerFiles[msg.sender][index];
+    File memory file = ownerFiles[msg.sender][index];
     ownerFiles[msg.sender][index] = ownerFiles[msg.sender][ownerFiles[msg.sender].length - 1];
     ownerFiles[msg.sender].pop();
 
-    doc.owner = _to;
-    ownerFiles[_to].push(doc);
+    file.owner = _to;
+    ownerFiles[_to].push(file);
     fileOwners[_fileId] = _to;
+
+    emit FileTransferred(_fileId, msg.sender, _to);
   }
 
   function shareFile(uint256 _fileId, address _account, Access _access) public payable {
@@ -149,6 +162,8 @@ contract Unidocs {
       access: _access
     });
     fileAccess[_fileId].push(access);
+
+    emit FileAccessShared(_fileId, msg.sender, _account, _access);
   }
 
   function revokeAccess(uint256 _fileId, address _account) public payable {
@@ -171,6 +186,8 @@ contract Unidocs {
       }
       accountFiles[_account].pop();
     }
+
+    emit FileAccessRevoked(_fileId, msg.sender, _account);
   }
 
   function getfileVersions(uint256 _fileId) public view returns (FileVersion[] memory) {
