@@ -53,7 +53,7 @@ const useGetFiles = ({ account }: useGetFilesProps) => {
   const {
     data: result,
     refetch,
-    isFetched
+    isFetched,
   } = useReadContract({
     ...unidocs,
     functionName: "getFiles",

@@ -11,6 +11,7 @@ export namespace Unidocs {
   export interface Version {
     versionId: bigint;
     filename: string;
+    createdBy: Address;
     description: string;
     checksum: string;
     filesize: bigint;
@@ -21,7 +22,7 @@ export namespace Unidocs {
 
   export interface File {
     createdAt: Date;
-    owner: string;
+    owner: Address;
     fileId: bigint;
     versions: Version[];
     permissions: AccountAccess[];
