@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, ReactNode } from "react";
 import { Unidocs } from "../types";
-import { useAccount } from "wagmi";
+import { useAccount, useWatchContractEvent } from "wagmi";
 import {
   type StoreFileProps,
   type UpdateFileProps,
@@ -52,44 +52,39 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
   const { shareFile } = useShareFile();
   const { revokeAccess } = useRevokeAccess();
 
-  const storeFile_ = async (props: StoreFileProps) =>
+  const storeFile_ = (props: StoreFileProps) =>
     storeFile(props).then(async (result) => {
       await refetch();
       return result;
     });
   const updateFile_ = (props: UpdateFileProps) =>
-    updateFile(props).then((result) => {
-      refetch();
+    updateFile(props).then(async (result) => {
+      await refetch();
       return result;
     });
   const transferFile_ = (props: TransferFileProps) =>
-    transferFile(props).then((result) => {
-      refetch();
+    transferFile(props).then(async (result) => {
+      await refetch();
       return result;
     });
   const updateFileDescription_ = (props: UpdateFileDescriptionProps) =>
-    updateFileDescription(props).then((result) => {
-      refetch();
+    updateFileDescription(props).then(async (result) => {
+      await refetch();
       return result;
     });
   const updateFileName_ = (props: UpdateFileNameProps) =>
-    updateFileName(props).then((result) => {
-      refetch();
+    updateFileName(props).then(async (result) => {
+      await refetch();
       return result;
     });
-  // const downloadFile_ = (props: DownloadFileProps) =>
-  //   downloadFile(props).then((result) => {
-  //     refetch();
-  //     return result;
-  //   });
   const shareFile_ = (props: ShareFileProps) =>
-    shareFile(props).then((result) => {
-      refetch();
+    shareFile(props).then(async (result) => {
+      await refetch();
       return result;
     });
   const revokeAccess_ = (props: RevokeAccessProps) =>
-    revokeAccess(props).then((result) => {
-      refetch();
+    revokeAccess(props).then(async (result) => {
+      await refetch();
       return result;
     });
 
