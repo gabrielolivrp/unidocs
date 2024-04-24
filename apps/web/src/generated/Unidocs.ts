@@ -58,6 +58,11 @@ export default {
         {
           "components": [
             {
+              "internalType": "address",
+              "name": "createdBy",
+              "type": "address"
+            },
+            {
               "internalType": "uint256",
               "name": "versionId",
               "type": "uint256"
@@ -135,6 +140,11 @@ export default {
       "outputs": [
         {
           "components": [
+            {
+              "internalType": "address",
+              "name": "createdBy",
+              "type": "address"
+            },
             {
               "internalType": "uint256",
               "name": "versionId",
