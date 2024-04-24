@@ -4,6 +4,7 @@ pragma solidity >=0.8.2 <0.9.0;
 
 contract Unidocs {
   struct FileVersion {
+    address createdBy;
     uint versionId;
     string[] ipfs;
     string filename;
@@ -68,6 +69,7 @@ contract Unidocs {
 
     FileVersion memory version = FileVersion({
       versionId: 1,
+      createdBy: msg.sender,
       filename: _filename,
       description: _description,
       checksum: _checksum,
@@ -107,6 +109,7 @@ contract Unidocs {
     uint256 versionId = fileVersions[_fileId].length + 1;
 
     FileVersion memory newVersion = FileVersion({
+      createdBy: msg.sender,
       versionId: versionId,
       filename: _filename,
       description: _description,
