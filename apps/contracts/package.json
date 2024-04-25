@@ -12,7 +12,7 @@
   "devDependencies": {
     "@unidocs/tsconfig": "*",
     "@types/node": "^20.11.7",
-    "@nomicfoundation/hardhat-toolbox-viem": "^2.0.0",
-    "hardhat": "^2.19.4"
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "hardhat": "^2.22.3"
   }
 }

@@ -3,7 +3,7 @@ import "@nomicfoundation/hardhat-toolbox-viem";
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.19",
+    version: "0.8.24",
     settings: {
       optimizer: {
         enabled: true,
@@ -11,7 +11,6 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  defaultNetwork: "localhost",
 };
 
 export default config;

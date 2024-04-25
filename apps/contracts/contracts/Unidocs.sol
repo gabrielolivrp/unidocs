@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.2 <0.9.0;
+pragma solidity ^0.8.24;
 
 contract Unidocs {
   struct FileVersion {
@@ -40,7 +40,6 @@ contract Unidocs {
   mapping(uint256 => FileVersion[]) private fileVersions;
   mapping(uint256 => AccountAccess[]) private fileAccess;
   mapping(address => uint256[]) private accountFiles;
-
 
   event FileCreated(uint256 indexed fileId, address indexed owner);
   event FileUpdated(uint256 indexed fileId, address indexed owner);
