@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, ReactNode } from "react";
 import { Unidocs } from "../types";
-import { useAccount, useWatchContractEvent } from "wagmi";
+import { useAccount } from "wagmi";
 import {
   type StoreFileProps,
   type UpdateFileProps,
@@ -11,6 +11,7 @@ import {
   type DownloadFileProps,
   type ShareFileProps,
   type RevokeAccessProps,
+  type AccessUpdateProps,
   useGetFiles,
   useStoreFile,
   useTransferFile,
@@ -20,6 +21,7 @@ import {
   useDownloadFile,
   useShareFile,
   useRevokeAccess,
+  useAccessUpdate,
 } from "../hooks";
 
 type UnidocsContextProps = {
@@ -32,6 +34,7 @@ type UnidocsContextProps = {
   downloadFile: (props: DownloadFileProps) => any;
   shareFile: (props: ShareFileProps) => any;
   revokeAccess: (props: RevokeAccessProps) => any;
+  accessUpdate: (props: AccessUpdateProps) => any;
 };
 
 const UnidocsContext = createContext<UnidocsContextProps | null>(null);
@@ -51,6 +54,7 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
   const { downloadFile } = useDownloadFile();
   const { shareFile } = useShareFile();
   const { revokeAccess } = useRevokeAccess();
+  const { accessUpdate } = useAccessUpdate();
 
   const storeFile_ = (props: StoreFileProps) =>
     storeFile(props).then(async (result) => {
@@ -87,6 +91,11 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
       await refetch();
       return result;
     });
+  const accessUpdate_ = (props: AccessUpdateProps) =>
+    accessUpdate(props).then(async (result) => {
+      await refetch();
+      return result;
+    });
 
   return (
     <UnidocsContext.Provider
@@ -100,6 +109,7 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
         updateFileName: updateFileName_,
         shareFile: shareFile_,
         revokeAccess: revokeAccess_,
+        accessUpdate: accessUpdate_,
       }}
     >
       {children}

@@ -6,6 +6,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DropdownMenu,
@@ -23,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@unidocs/ui";
-import { formatBytes } from "@/helpers";
 import { Hash } from "./hash";
 import { AccountAvatar } from "./account-avatar";
 import { Unidocs, useUnidocs } from "@unidocs/use-unidocs";
@@ -42,8 +42,11 @@ const ShareFileDialog = ({
   onOpenChange,
 }: ShareFileDialogProps) => {
   const [account, setAccount] = useState("");
-  const [permission, setPermission] = useState<Unidocs.Access>("READ");
   const [formError, setFormError] = useState("");
+  const [accountAccess, setAccountAccess] =
+    useState<Unidocs.AccountAccess | null>(null);
+  const [access, setAccess] = useState<Unidocs.Access>("READ");
+  const [accessUpdateModal, setAccessUpdateModal] = useState(false);
   const writeTx = useTransactor({
     onError: (err) => {
       toast(err);
@@ -51,10 +54,11 @@ const ShareFileDialog = ({
     onSuccess: () => {
       toast("Transaction completed successfully");
       onOpenChange(false);
+      setAccessUpdateModal(false);
     },
   });
   const { address } = useAccount();
-  const { shareFile, revokeAccess } = useUnidocs();
+  const { shareFile, revokeAccess, accessUpdate } = useUnidocs();
 
   useEffect(() => setFormError(""), [account]);
 
@@ -64,7 +68,7 @@ const ShareFileDialog = ({
       return;
     }
 
-    if (!permission) {
+    if (!access) {
       setFormError("Permission is required");
       return;
     }
@@ -73,15 +77,12 @@ const ShareFileDialog = ({
       shareFile({
         fileId: file.fileId,
         account: account as Address,
-        access: permission,
+        access,
       })
     );
   };
 
-  const handleRemove = (
-    file: Unidocs.File,
-    accountPermission: Unidocs.AccountAccess
-  ) =>
+  const handleRemove = (accountPermission: Unidocs.AccountAccess) =>
     writeTx(() =>
       revokeAccess({
         fileId: file.fileId,
@@ -89,30 +90,141 @@ const ShareFileDialog = ({
       })
     );
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Share</DialogTitle>
-        </DialogHeader>
+  const handleOpenAccessUpdate = (accountPermission: Unidocs.AccountAccess) => {
+    setAccessUpdateModal(true);
+    setAccess(accountPermission.access);
+    setAccountAccess(accountPermission);
+  };
 
-        <div className="flex flex-col">
-          <div className="grid grid-cols-3 gap-4">
-            <FormItem className="col-span-2">
-              <FormLabel>Account address</FormLabel>
-              <Input
-                placeholder="0x..."
-                onChange={(e) => setAccount(e.target.value)}
-              />
-            </FormItem>
+  const handleAccessUpdate = () => {
+    if (!accountAccess) return;
+
+    return writeTx(() =>
+      accessUpdate({
+        fileId: file.fileId,
+        account: accountAccess.account,
+        access,
+      })
+    );
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col">
             <div className="grid grid-cols-3 gap-4">
+              <FormItem className="col-span-2">
+                <FormLabel>Account address</FormLabel>
+                <Input
+                  placeholder="0x..."
+                  onChange={(e) => setAccount(e.target.value)}
+                />
+              </FormItem>
+              <div className="grid grid-cols-3 gap-4">
+                <FormItem className="col-span-2">
+                  <FormLabel>Permission</FormLabel>
+                  <Select
+                    defaultValue={access}
+                    onValueChange={(value) =>
+                      setAccess(value as Unidocs.Access)
+                    }
+                  >
+                    <SelectTrigger className="">
+                      <SelectValue placeholder="..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="READ">Read</SelectItem>
+                      <SelectItem value="WRITE">Write</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+                <div className="flex items-end">
+                  <Button
+                    disabled={!account || !access}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <Icon
+                      name="Plus"
+                      onClick={onSubmit}
+                      className="cursor-pointer"
+                    />
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <FormMessage>{formError}</FormMessage>
+          </div>
+
+          <table className=" border-spacing-2">
+            <tbody>
+              {file.permissions.map((accountPermission, index) => (
+                <tr key={index}>
+                  <td>
+                    <div className="flex items-center space-x-3">
+                      <AccountAvatar
+                        address={accountPermission.account as Address}
+                      />
+                      <Hash text={accountPermission.account as Address} />
+                    </div>
+                  </td>
+                  <td>
+                    <Badge className="lowercase">
+                      {accountPermission.account === address
+                        ? "OWNER"
+                        : accountPermission.access}
+                    </Badge>
+                  </td>
+                  <td>
+                    {accountPermission.account !== address && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Icon name="MoreVertical"></Icon>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => handleRemove(accountPermission)}
+                          >
+                            Remove
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleOpenAccessUpdate(accountPermission)
+                            }
+                          >
+                            Update Access
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </DialogContent>
+      </Dialog>
+
+      {accountAccess && (
+        <Dialog open={accessUpdateModal} onOpenChange={setAccessUpdateModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                Update Access <Hash text={accountAccess.account} />
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="flex flex-col">
               <FormItem className="col-span-2">
                 <FormLabel>Permission</FormLabel>
                 <Select
-                  defaultValue={permission}
-                  onValueChange={(value) =>
-                    setPermission(value as Unidocs.Access)
-                  }
+                  defaultValue={access}
+                  onValueChange={(value) => setAccess(value as Unidocs.Access)}
                 >
                   <SelectTrigger className="">
                     <SelectValue placeholder="..." />
@@ -123,65 +235,22 @@ const ShareFileDialog = ({
                   </SelectContent>
                 </Select>
               </FormItem>
-              <div className="flex items-end">
-                <Button
-                  disabled={!account || !permission}
-                  variant="ghost"
-                  size="icon"
-                >
-                  <Icon
-                    name="Plus"
-                    onClick={onSubmit}
-                    className="cursor-pointer"
-                  />
-                </Button>
-              </div>
+              <FormMessage>{formError}</FormMessage>
             </div>
-          </div>
-          <FormMessage>{formError}</FormMessage>
-        </div>
-
-        <table className=" border-spacing-2">
-          <tbody>
-            {file.permissions.map((accountPermission, index) => (
-              <tr key={index}>
-                <td>
-                  <div className="flex items-center space-x-3">
-                    <AccountAvatar
-                      address={accountPermission.account as Address}
-                    />
-                    <Hash text={accountPermission.account as Address} />
-                  </div>
-                </td>
-                <td>
-                  <Badge className="lowercase">
-                    {accountPermission.account === address
-                      ? "OWNER"
-                      : accountPermission.access}
-                  </Badge>
-                </td>
-                <td>
-                  {accountPermission.account !== address && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Icon name="MoreVertical"></Icon>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => handleRemove(file, accountPermission)}
-                        >
-                          Remove
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </DialogContent>
-    </Dialog>
+            <DialogFooter>
+              <Button
+                autoFocus
+                variant="outline"
+                onClick={() => setAccessUpdateModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleAccessUpdate}>Confirm</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 };
 

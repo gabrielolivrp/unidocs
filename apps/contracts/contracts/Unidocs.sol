@@ -46,6 +46,7 @@ contract Unidocs {
   event FileTransferred(uint256 indexed fileId, address indexed previousOwner, address indexed newOwner);
   event FileAccessShared(uint256 indexed fileId, address indexed owner, address indexed account, Unidocs.Access access);
   event FileAccessRevoked(uint256 indexed fileId, address indexed owner, address indexed account);
+  event FileAccessUpdated(uint256 indexed fileId, address indexed owner, address indexed account);
 
   constructor() {
     owner = msg.sender;
@@ -187,6 +188,19 @@ contract Unidocs {
     }
 
     emit FileAccessRevoked(_fileId, msg.sender, _account);
+  }
+
+  function accessUpdate(uint256 _fileId, address _account, Access _access) public payable {
+    require(fileOwners[_fileId] != address(0), "File not found");
+    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
+    require(_account != msg.sender, "Cannot revoke owner's access");
+
+    uint256 accessIndex = _findAccessIndex(_fileId, _account);
+    require(accessIndex < fileAccess[_fileId].length, "Access not found");
+
+    fileAccess[_fileId][accessIndex].access = _access;
+
+    emit FileAccessUpdated(_fileId, msg.sender, _account);
   }
 
   function getfileVersions(uint256 _fileId) public view returns (FileVersion[] memory) {

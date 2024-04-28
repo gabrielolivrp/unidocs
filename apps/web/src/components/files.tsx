@@ -121,9 +121,9 @@ const Files = ({ layout }: FilesProps) => {
           </THead>
           <TBody>
             {files?.map((file, index) => (
-              <ContextMenu>
+              <ContextMenu key={index}>
                 <ContextMenuTrigger asChild>
-                  <Tr key={index} className="hover:bg-muted/95 border-b">
+                  <Tr className="hover:bg-muted/95 border-b">
                     <Td>
                       <div className="flex items-center space-x-2">
                         <FileIcon

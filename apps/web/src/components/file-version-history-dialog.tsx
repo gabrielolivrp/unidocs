@@ -119,8 +119,6 @@ const changesPerDay = (changes: Change[]) => {
     }
     changesByDay[dateKey].push(change);
   });
-  console.log(changesByDay);
-
   return changesByDay;
 };
 
@@ -159,15 +157,15 @@ const FileVersionHistoryDialog = ({
 
           <div>
             {Object.entries(versionHistory).map(([key, data]) => (
-              <>
+              <div key={key}>
                 <div className="ps-2 my-2 first:mt-0">
                   <Typography as="h3" variant="mutedText">
                     {key}
                   </Typography>
                 </div>
 
-                {data.toReversed().map((change) => (
-                  <ContextMenu>
+                {data.toReversed().map((change, index) => (
+                  <ContextMenu key={index}>
                     <ContextMenuTrigger asChild>
                       <div className="flex gap-x-3 relative group rounded-00">
                         <div className="relative last:after:hidden after:absolute after:top-0 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200">
@@ -227,7 +225,7 @@ const FileVersionHistoryDialog = ({
                     </ContextMenuContent>
                   </ContextMenu>
                 ))}
-              </>
+              </div>
             ))}
           </div>
         </DialogContent>

@@ -44,11 +44,6 @@ export const actions = [
     permissions: ["READ", "WRITE"],
   },
   {
-    name: "Open",
-    event: "view",
-    permissions: ["READ", "WRITE"],
-  },
-  {
     name: "Share",
     event: "share",
     owned: true,
