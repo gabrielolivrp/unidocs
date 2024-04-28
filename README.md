@@ -4,12 +4,12 @@ Unidocs is a decentralized file storage system built to provide secure and distr
 
 ### Usage
 
-### Step 1: Run the Web Interface
+### Step 1: Run the Web Interface and IPFS server
 
 To start the web interface, run the following command:
 
 ```
-$ yarn web:dev
+$ npm run dev
 ```
 
 ### Step 2: Run a local network
@@ -17,7 +17,7 @@ $ yarn web:dev
 To run a local network, execute the following command:
 
 ```
-$ yarn contracts:chain
+$ npm run contracts:chain
 ```
 
 ### Step 3: Deploy the Smart Contract
@@ -27,7 +27,7 @@ Before deploying the smart contract, ensure that the local network is running.
 To deploy the smart contract, run the following command:
 
 ```
-$ yarn contracts:deploy
+$ npm run contracts:deploy
 ```
 
 Once all the steps above are completed successfully, you can access Unidocs by navigating to http://localhost:3000 in your web browser.
