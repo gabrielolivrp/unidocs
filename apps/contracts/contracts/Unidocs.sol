@@ -52,10 +52,6 @@ contract Unidocs {
     owner = msg.sender;
   }
 
-  receive() external payable {}
-
-  fallback() external payable {}
-
   function storeFile(
     string memory _filename,
     string memory _description,
@@ -64,7 +60,7 @@ contract Unidocs {
     string memory _mimetype,
     uint256 _filesize,
     uint _createdAt
-  ) public payable {
+  ) public {
     address _owner = msg.sender;
     uint256 fileId = fileCount + 1;
 
@@ -111,7 +107,7 @@ contract Unidocs {
     string memory _mimetype,
     uint256 _filesize,
     uint _createdAt
-  ) public payable {
+  ) public {
     require(fileOwners[_fileId] != address(0), "File not found");
     require(_hasAccess(_fileId, msg.sender) == Access.WRITE || fileOwners[_fileId] == msg.sender, "No write permission");
 
@@ -134,7 +130,7 @@ contract Unidocs {
     emit FileUpdated(_fileId, msg.sender);
   }
 
-  function transferFile(address _to, uint256 _fileId) public payable {
+  function transferFile(address _to, uint256 _fileId) public {
     require(fileOwners[_fileId] != address(0), "File not found");
     require(fileOwners[_fileId] == msg.sender, "Not the File owner");
     uint256 index = _findFileIndex(ownerFiles[msg.sender], _fileId);
@@ -151,7 +147,7 @@ contract Unidocs {
     emit FileTransferred(_fileId, msg.sender, _to);
   }
 
-  function shareFile(uint256 _fileId, address _account, Access _access) public payable {
+  function shareFile(uint256 _fileId, address _account, Access _access) public {
     require(fileOwners[_fileId] != address(0), "File not found");
     require(fileOwners[_fileId] == msg.sender, "Not the File owner");
     require(_account != msg.sender, "Cannot share with owner");
@@ -166,7 +162,7 @@ contract Unidocs {
     emit FileAccessShared(_fileId, msg.sender, _account, _access);
   }
 
-  function revokeAccess(uint256 _fileId, address _account) public payable {
+  function revokeAccess(uint256 _fileId, address _account) public {
     require(fileOwners[_fileId] != address(0), "File not found");
     require(fileOwners[_fileId] == msg.sender, "Not the File owner");
     require(_account != msg.sender, "Cannot revoke owner's access");
@@ -190,7 +186,7 @@ contract Unidocs {
     emit FileAccessRevoked(_fileId, msg.sender, _account);
   }
 
-  function accessUpdate(uint256 _fileId, address _account, Access _access) public payable {
+  function accessUpdate(uint256 _fileId, address _account, Access _access) public {
     require(fileOwners[_fileId] != address(0), "File not found");
     require(fileOwners[_fileId] == msg.sender, "Not the File owner");
     require(_account != msg.sender, "Cannot revoke owner's access");
