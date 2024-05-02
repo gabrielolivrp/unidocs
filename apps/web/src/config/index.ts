@@ -1,7 +1,6 @@
 import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import { hardhat } from "wagmi/chains";
-import { createClient } from "viem";
 
 const metadata = {
   name: "Unidocs",
@@ -10,7 +9,11 @@ const metadata = {
   icons: [],
 };
 
-export const projectId = "bf40620d1ef48bce75c5410dd0ad49c0";
+if (!process.env.NEXT_PUBLIC_PROJECT_ID) {
+  throw new Error("NEXT_PUBLIC_PROJECT_ID");
+}
+
+export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string;
 
 export const defaultChain = hardhat;
 
