@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useReadContract } from "wagmi";
 import { Address } from "viem";
 import { getContract } from "../helpers/getContracts";
-import { Unidocs } from "../types";
+import { fromPermission, toPermission, Unidocs } from "../types";
 
 interface useGetFilesProps {
   account: Address;
@@ -19,27 +19,27 @@ type Version = Omit<Unidocs.Version, "createdAt"> & {
   createdAt: bigint;
 };
 
-type AccountAccess = Omit<Unidocs.AccountAccess, "access"> & {
-  access: number;
+type AccessControl = Omit<Unidocs.AccessControl, "permission"> & {
+  permission: number;
 };
 
 const mapFile = (
   file: File,
-  access: AccountAccess[],
-  versions: Version[]
+  versions: Version[],
+  accessControls: AccessControl[]
 ): Unidocs.File => {
-  const versions2 = versions.map((version) => ({
+  const versions_ = versions.map((version) => ({
     ...version,
     createdAt: new Date(Number(version.createdAt)),
   }));
-  const currentVersion = versions2[versions.length - 1];
+  const currentVersion = versions_[versions.length - 1];
   return {
     ...file,
     currentVersion,
-    versions: versions2,
-    permissions: access.map((a) => ({
-      ...a,
-      access: a.access === 0 ? "WRITE" : "READ",
+    versions: versions_,
+    accessControls: accessControls.map((accessControl) => ({
+      ...accessControl,
+      permission: toPermission(accessControl.permission)
     })),
     createdAt: new Date(Number(file.createdAt)),
   };
@@ -74,7 +74,7 @@ const useGetFiles = ({ account }: useGetFilesProps) => {
   useEffect(() => {
     const [files_, versions, access] = data;
     const updatedFiles = (files_ ?? []).map((file: any, index: any) =>
-      mapFile(file, access[index], versions[index])
+      mapFile(file, versions[index], access[index])
     );
     setFiles(updatedFiles);
   }, [data]);

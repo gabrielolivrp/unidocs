@@ -1,11 +1,17 @@
 import { Address } from "viem";
 
-export namespace Unidocs {
-  export type Access = "WRITE" | "READ";
+const fromPermission = (permission: Unidocs.Permission) =>
+  permission === "READ" ? 0 : 1;
 
-  export interface AccountAccess {
+const toPermission = (permission: number) =>
+  permission === 0 ? "READ" : "WRITE";
+
+export namespace Unidocs {
+  export type Permission = "WRITE" | "READ";
+
+  export interface AccessControl {
     account: Address;
-    access: Access;
+    permission: Permission;
   }
 
   export interface Version {
@@ -25,7 +31,9 @@ export namespace Unidocs {
     owner: Address;
     fileId: bigint;
     versions: Version[];
-    permissions: AccountAccess[];
+    accessControls: AccessControl[];
     currentVersion: Version;
   }
 }
+
+export { fromPermission, toPermission };

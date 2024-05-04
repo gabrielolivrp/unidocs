@@ -3,7 +3,17 @@
 pragma solidity ^0.8.24;
 
 contract Unidocs {
-  struct FileVersion {
+  enum Permission {
+    READ,
+    WRITE
+  }
+
+  struct AccessControl {
+    address account;
+    Permission permission;
+  }
+
+  struct Version {
     address createdBy;
     uint versionId;
     string[] ipfs;
@@ -21,32 +31,50 @@ contract Unidocs {
     uint createdAt;
   }
 
-  enum Access {
-    WRITE,
-    READ
-  }
-
-  struct AccountAccess {
-    address account;
-    Access access;
-  }
-
+  /// @dev The owner of the contract.
   address public owner;
 
-  uint256 public fileCount = 0;
+  /// @dev Current fileId, used as token id.
+  uint256 public fileId = 0;
 
-  mapping(uint256 => address) private fileOwners;
-  mapping(address => File[]) private ownerFiles;
-  mapping(uint256 => FileVersion[]) private fileVersions;
-  mapping(uint256 => AccountAccess[]) private fileAccess;
-  mapping(address => uint256[]) private accountFiles;
+  /// @dev Mapping of fileId to address.
+  mapping(uint256 => address) private fileAccount;
 
+  /// @dev Mapping of address to files.
+  mapping(address => File[]) private accountFiles;
+
+  /// @dev Mapping of address to fileIds.
+  mapping(address => uint256[]) private accessibleFiles;
+
+  /// @dev Mapping of fileId to file versions.
+  mapping(uint256 => Version[]) private fileVersions;
+
+  /// @dev Mapping of fileId to access control.
+  mapping(uint256 => AccessControl[]) private accessControls;
+
+  /// @dev Emitted when file is created.
   event FileCreated(uint256 indexed fileId, address indexed owner);
+
+  /// @dev Emitted when file is updated.
   event FileUpdated(uint256 indexed fileId, address indexed owner);
+
+  /// @dev Emitted when file is trasferred.
   event FileTransferred(uint256 indexed fileId, address indexed previousOwner, address indexed newOwner);
-  event FileAccessShared(uint256 indexed fileId, address indexed owner, address indexed account, Unidocs.Access access);
+
+  /// @dev Emitted when file is shared.
+  event FileAccessShared(uint256 indexed fileId, address indexed owner, address indexed account, Permission permission);
+
+  /// @dev Emitted when file is revoked.
   event FileAccessRevoked(uint256 indexed fileId, address indexed owner, address indexed account);
-  event FileAccessUpdated(uint256 indexed fileId, address indexed owner, address indexed account);
+
+  /// @dev Emitted when file access is updated.
+  event AccessPermissionUpdated(uint256 indexed fileId, address indexed owner, address indexed account);
+
+  /// @dev Emitted when `msg.sender` is not authorized to operate the contract.
+  error Unauthorized(address operator);
+
+  /// @dev Emitted when file is not found.
+  error FileNotFound(uint256 fileId);
 
   constructor() {
     owner = msg.sender;
@@ -61,41 +89,41 @@ contract Unidocs {
     uint256 _filesize,
     uint _createdAt
   ) public {
+    uint256 _fileId = fileId + 1;
     address _owner = msg.sender;
-    uint256 fileId = fileCount + 1;
 
-    File memory doc = File({
-      fileId: fileId,
+    File memory _file = File({
+      fileId: _fileId,
       owner: _owner,
       createdAt: _createdAt
     });
 
-    FileVersion memory version = FileVersion({
+    Version memory _version = Version({
       versionId: 1,
-      createdBy: msg.sender,
+      createdBy: _owner,
       filename: _filename,
       description: _description,
       checksum: _checksum,
       mimetype: _mimetype,
       filesize: _filesize,
-      ipfs: _ipfs,
-      createdAt: _createdAt
+      createdAt: _createdAt,
+      ipfs: _ipfs
     });
 
-    AccountAccess memory access = AccountAccess({
+    AccessControl memory _accessControl = AccessControl({
       account: _owner,
-      access: Access.WRITE
+      permission: Permission.WRITE
     });
 
-    ownerFiles[_owner].push(doc);
-    fileVersions[fileId].push(version);
-    fileOwners[fileId] = _owner;
-    accountFiles[_owner].push(fileId);
-    fileAccess[fileId].push(access);
+    fileAccount[_fileId] = _owner;
+    fileVersions[_fileId].push(_version);
+    accessibleFiles[_owner].push(_fileId);
+    accountFiles[_owner].push(_file);
+    accessControls[_fileId].push(_accessControl);
 
-    fileCount += 1;
+    fileId += 1;
 
-    emit FileCreated(fileId, _owner);
+    emit FileCreated(_fileId, _owner);
   }
 
   function updateFile(
@@ -108,21 +136,28 @@ contract Unidocs {
     uint256 _filesize,
     uint _createdAt
   ) public {
-    require(fileOwners[_fileId] != address(0), "File not found");
-    require(_hasAccess(_fileId, msg.sender) == Access.WRITE || fileOwners[_fileId] == msg.sender, "No write permission");
+    address _createdBy = msg.sender;
 
-    uint256 versionId = fileVersions[_fileId].length + 1;
+    if (fileAccount[_fileId] == address(0)) {
+      revert FileNotFound(_fileId);
+    }
 
-    FileVersion memory newVersion = FileVersion({
-      createdBy: msg.sender,
-      versionId: versionId,
+    (, AccessControl memory _accessControl) = _findAccessControl(_fileId, _createdBy);
+    if (_accessControl.permission != Permission.WRITE) {
+      revert Unauthorized(_createdBy);
+    }
+
+    uint256 _versionId = fileVersions[_fileId].length + 1;
+    Version memory newVersion = Version({
+      createdBy: _createdBy,
+      versionId: _versionId,
       filename: _filename,
       description: _description,
       checksum: _checksum,
       mimetype: _mimetype,
       filesize: _filesize,
-      ipfs: _ipfs,
-      createdAt: _createdAt
+      createdAt: _createdAt,
+      ipfs: _ipfs
     });
 
     fileVersions[_fileId].push(newVersion);
@@ -131,127 +166,130 @@ contract Unidocs {
   }
 
   function transferFile(address _to, uint256 _fileId) public {
-    require(fileOwners[_fileId] != address(0), "File not found");
-    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
-    uint256 index = _findFileIndex(ownerFiles[msg.sender], _fileId);
-    require(index < ownerFiles[msg.sender].length, "Invalid File index");
+    address _owner = msg.sender;
+    if (fileAccount[_fileId] == address(0)) {
+      revert FileNotFound(_fileId);
+    }
 
-    File memory file = ownerFiles[msg.sender][index];
-    ownerFiles[msg.sender][index] = ownerFiles[msg.sender][ownerFiles[msg.sender].length - 1];
-    ownerFiles[msg.sender].pop();
+    if (fileAccount[_fileId] != _owner) {
+      revert Unauthorized(_owner);
+    }
+
+    (uint256 fileIndex, File memory file) = _findFile(_fileId);
+    for (uint256 i = fileIndex; i < accountFiles[_owner].length - 1; i++) {
+      accountFiles[_owner][i] = accountFiles[_owner][i + 1];
+    }
+    accountFiles[_owner].pop();
 
     file.owner = _to;
-    ownerFiles[_to].push(file);
-    fileOwners[_fileId] = _to;
+    fileAccount[_fileId] = _to;
+    accountFiles[_to].push(file);
 
-    emit FileTransferred(_fileId, msg.sender, _to);
+    emit FileTransferred(_fileId, _owner, _to);
   }
 
-  function shareFile(uint256 _fileId, address _account, Access _access) public {
-    require(fileOwners[_fileId] != address(0), "File not found");
-    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
-    require(_account != msg.sender, "Cannot share with owner");
+  function shareFile(uint256 _fileId, address _account, Permission _permission) public {
+    address _owner = msg.sender;
+    if (fileAccount[_fileId] == address(0)) {
+      revert FileNotFound(_fileId);
+    }
 
-    accountFiles[_account].push(_fileId);
-    AccountAccess memory access = AccountAccess({
+    if (fileAccount[_fileId] != _owner || _account == _owner) {
+      revert Unauthorized(_owner);
+    }
+
+    AccessControl memory _accessControl = AccessControl({
       account: _account,
-      access: _access
+      permission: _permission
     });
-    fileAccess[_fileId].push(access);
+    accessibleFiles[_account].push(_fileId);
+    accessControls[_fileId].push(_accessControl);
 
-    emit FileAccessShared(_fileId, msg.sender, _account, _access);
+    emit FileAccessShared(_fileId, _owner, _account, _permission);
   }
 
-  function revokeAccess(uint256 _fileId, address _account) public {
-    require(fileOwners[_fileId] != address(0), "File not found");
-    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
-    require(_account != msg.sender, "Cannot revoke owner's access");
-
-    uint256 accessIndex = _findAccessIndex(_fileId, _account);
-    require(accessIndex < fileAccess[_fileId].length, "Access not found");
-
-    for (uint256 i = accessIndex; i < fileAccess[_fileId].length - 1; i++) {
-      fileAccess[_fileId][i] = fileAccess[_fileId][i + 1];
+  function revokeFileAccess(uint256 _fileId, address _account) public {
+    address _owner = msg.sender;
+    if (fileAccount[_fileId] == address(0)) {
+      revert FileNotFound(_fileId);
     }
-    fileAccess[_fileId].pop();
 
-    uint256 userAccessIndex = _findUserAccessIndex(_account, _fileId);
-    if (userAccessIndex < accountFiles[_account].length) {
-      for (uint256 j = userAccessIndex; j < accountFiles[_account].length - 1; j++) {
-        accountFiles[_account][j] = accountFiles[_account][j + 1];
-      }
-      accountFiles[_account].pop();
+    if (fileAccount[_fileId] != _owner || _account == _owner) {
+      revert Unauthorized(_owner);
     }
+
+    (uint256 accessControlIndex,) = _findAccessControl(_fileId, _account);
+    for (uint256 i = accessControlIndex; i < accessControls[_fileId].length - 1; i++) {
+      accessControls[_fileId][i] = accessControls[_fileId][i + 1];
+    }
+    accessControls[_fileId].pop();
+
+    (uint256 accessibleFileIndex, )= _findAccessibleFile(_fileId, _account);
+    for (uint256 j = accessibleFileIndex; j < accessibleFiles[_account].length - 1; j++) {
+      accessibleFiles[_account][j] = accessibleFiles[_account][j + 1];
+    }
+    accessibleFiles[_account].pop();
 
     emit FileAccessRevoked(_fileId, msg.sender, _account);
   }
 
-  function accessUpdate(uint256 _fileId, address _account, Access _access) public {
-    require(fileOwners[_fileId] != address(0), "File not found");
-    require(fileOwners[_fileId] == msg.sender, "Not the File owner");
-    require(_account != msg.sender, "Cannot revoke owner's access");
-
-    uint256 accessIndex = _findAccessIndex(_fileId, _account);
-    require(accessIndex < fileAccess[_fileId].length, "Access not found");
-
-    fileAccess[_fileId][accessIndex].access = _access;
-
-    emit FileAccessUpdated(_fileId, msg.sender, _account);
-  }
-
-  function getfileVersions(uint256 _fileId) public view returns (FileVersion[] memory) {
-    return fileVersions[_fileId];
-  }
-
-  function getFiles(address _account) public view returns (File[] memory, FileVersion[][] memory, AccountAccess[][] memory) {
-    File[] memory docs = new File[](accountFiles[_account].length);
-    FileVersion[][] memory versions = new FileVersion[][](docs.length);
-    AccountAccess[][] memory accesses = new AccountAccess[][](docs.length);
-
-    for (uint256 i = 0; i < accountFiles[_account].length; i++) {
-      uint256 fileId = accountFiles[_account][i];
-      uint256 index = _findFileIndex(ownerFiles[fileOwners[fileId]], fileId);
-      docs[i] = ownerFiles[fileOwners[fileId]][index];
-      versions[i] = fileVersions[fileId];
-      accesses[i] = fileAccess[fileId];
+  function updateAccessPermission(uint256 _fileId, address _account, Permission _permission) public {
+    address _owner = msg.sender;
+    if (fileAccount[_fileId] == address(0)) {
+      revert FileNotFound(_fileId);
     }
 
-    return (docs, versions, accesses);
+    if (fileAccount[_fileId] != _owner || _account == _owner) {
+      revert Unauthorized(_owner);
+    }
+
+    (uint256 accessControlIndex,) = _findAccessControl(_fileId, _account);
+    accessControls[_fileId][accessControlIndex].permission = _permission;
+
+    emit AccessPermissionUpdated(_fileId, _owner, _account);
   }
 
-  function _findFileIndex(File[] memory docs, uint256 _fileId) private pure returns (uint256) {
-    for (uint256 i = 0; i < docs.length; i++) {
-      if (docs[i].fileId == _fileId) {
-        return i;
+  function getFiles(address _account) public view returns (File[] memory, Version[][] memory, AccessControl[][] memory) {
+    File[] memory _files = new File[](accessibleFiles[_account].length);
+    Version[][] memory _versions = new Version[][](_files.length);
+    AccessControl[][] memory _accessControls = new AccessControl[][](_files.length);
+
+    for (uint256 i = 0; i < accessibleFiles[_account].length; i++) {
+      uint256 _fileId = accessibleFiles[_account][i];
+      (, File memory file) = _findFile(_fileId);
+      _versions[i] = fileVersions[_fileId];
+      _accessControls[i] = accessControls[_fileId];
+      _files[i] = file;
+    }
+
+    return (_files, _versions, _accessControls);
+  }
+
+  function _findAccessibleFile(uint256 _fileId, address _account) private view returns (uint256, uint256) {
+    for (uint256 i = 0; i < accessibleFiles[_account].length; i++) {
+      if (accessibleFiles[_account][i] == _fileId) {
+        return (i, accessibleFiles[_account][i]);
       }
     }
-    revert("File not found");
+    revert Unauthorized(_account);
   }
 
-  function _hasAccess(uint256 _fileId, address _account) private view returns (Access) {
-    for (uint i = 0; i < fileAccess[_fileId].length; i++) {
-      if (fileAccess[_fileId][i].account == _account) {
-        return fileAccess[_fileId][i].access;
+  function _findFile(uint256 _fileId) private view returns (uint256, File memory) {
+    File[] memory files = accountFiles[fileAccount[_fileId]];
+    for (uint256 i = 0; i < files.length; i++) {
+      if (files[i].fileId == _fileId) {
+        return (i, files[i]);
       }
     }
-    revert("No access");
+    revert FileNotFound(_fileId);
   }
 
-  function _findAccessIndex(uint256 _fileId, address _account) private view returns (uint256) {
-    for (uint256 i = 0; i < fileAccess[_fileId].length; i++) {
-      if (fileAccess[_fileId][i].account == _account) {
-        return i;
+  function _findAccessControl(uint256 _fileId, address _account) private view returns (uint256, AccessControl memory) {
+    for (uint256 i = 0; i < accessControls[_fileId].length; i++) {
+      if (accessControls[_fileId][i].account == _account) {
+        return (i, accessControls[_fileId][i]);
       }
     }
-    return fileAccess[_fileId].length;
-  }
-
-  function _findUserAccessIndex(address _account, uint256 _fileId) private view returns (uint256) {
-    for (uint256 i = 0; i < accountFiles[_account].length; i++) {
-      if (accountFiles[_account][i] == _fileId) {
-        return i;
-      }
-    }
-    return accountFiles[_account].length;
+    revert Unauthorized(_account);
   }
 }

@@ -1,10 +1,57 @@
 export default {
-  "address": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+  "address": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
   "abi": [
     {
       "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "fileId",
+          "type": "uint256"
+        }
+      ],
+      "name": "FileNotFound",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        }
+      ],
+      "name": "Unauthorized",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "fileId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "AccessPermissionUpdated",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -54,37 +101,12 @@ export default {
         },
         {
           "indexed": false,
-          "internalType": "enum Unidocs.Access",
-          "name": "access",
+          "internalType": "enum Unidocs.Permission",
+          "name": "permission",
           "type": "uint8"
         }
       ],
       "name": "FileAccessShared",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "fileId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "FileAccessUpdated",
       "type": "event"
     },
     {
@@ -151,35 +173,8 @@ export default {
       "type": "event"
     },
     {
-      "stateMutability": "payable",
-      "type": "fallback"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_fileId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_account",
-          "type": "address"
-        },
-        {
-          "internalType": "enum Unidocs.Access",
-          "name": "_access",
-          "type": "uint8"
-        }
-      ],
-      "name": "accessUpdate",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
       "inputs": [],
-      "name": "fileCount",
+      "name": "fileId",
       "outputs": [
         {
           "internalType": "uint256",
@@ -270,7 +265,7 @@ export default {
               "type": "uint256"
             }
           ],
-          "internalType": "struct Unidocs.FileVersion[][]",
+          "internalType": "struct Unidocs.Version[][]",
           "name": "",
           "type": "tuple[][]"
         },
@@ -282,80 +277,14 @@ export default {
               "type": "address"
             },
             {
-              "internalType": "enum Unidocs.Access",
-              "name": "access",
+              "internalType": "enum Unidocs.Permission",
+              "name": "permission",
               "type": "uint8"
             }
           ],
-          "internalType": "struct Unidocs.AccountAccess[][]",
+          "internalType": "struct Unidocs.AccessControl[][]",
           "name": "",
           "type": "tuple[][]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_fileId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getfileVersions",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "createdBy",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "versionId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string[]",
-              "name": "ipfs",
-              "type": "string[]"
-            },
-            {
-              "internalType": "string",
-              "name": "filename",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "filesize",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "description",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "mimetype",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "checksum",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "createdAt",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct Unidocs.FileVersion[]",
-          "name": "",
-          "type": "tuple[]"
         }
       ],
       "stateMutability": "view",
@@ -387,9 +316,9 @@ export default {
           "type": "address"
         }
       ],
-      "name": "revokeAccess",
+      "name": "revokeFileAccess",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -405,14 +334,14 @@ export default {
           "type": "address"
         },
         {
-          "internalType": "enum Unidocs.Access",
-          "name": "_access",
+          "internalType": "enum Unidocs.Permission",
+          "name": "_permission",
           "type": "uint8"
         }
       ],
       "name": "shareFile",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -455,7 +384,7 @@ export default {
       ],
       "name": "storeFile",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -473,7 +402,30 @@ export default {
       ],
       "name": "transferFile",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fileId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "enum Unidocs.Permission",
+          "name": "_permission",
+          "type": "uint8"
+        }
+      ],
+      "name": "updateAccessPermission",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -521,12 +473,8 @@ export default {
       ],
       "name": "updateFile",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
-    },
-    {
-      "stateMutability": "payable",
-      "type": "receive"
     }
   ]
 } as const

@@ -3,24 +3,28 @@ import { getContract } from "../helpers/getContracts";
 import { Address } from "viem";
 import { fromPermission, Unidocs } from "../types";
 
-export interface ShareFileProps {
+export interface UpdateAccessPermissionProps {
   fileId: bigint;
   account: Address;
   permission: Unidocs.Permission;
 }
 
-const useShareFile = () => {
+const useUpdateAccessPermission = () => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
-  const shareFile = async ({ fileId, account, permission }: ShareFileProps) =>
+  const updateAccessPermission = async ({
+    fileId,
+    account,
+    permission,
+  }: UpdateAccessPermissionProps) =>
     writeContractAsync({
       ...unidocs,
-      functionName: "shareFile",
+      functionName: "updateAccessPermission",
       args: [fileId, account, fromPermission(permission)],
     });
 
-  return { shareFile };
+  return { updateAccessPermission };
 };
 
-export { useShareFile };
+export { useUpdateAccessPermission };

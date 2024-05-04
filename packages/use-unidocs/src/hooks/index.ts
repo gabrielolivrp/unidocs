@@ -6,5 +6,5 @@ export * from "./useUpdateFileDescription";
 export * from "./useUpdateFileName";
 export * from "./useDownloadFile";
 export * from "./useShareFile";
-export * from "./useRevokeAccess";
-export * from "./useAccessUpdate";
+export * from "./revokeFileAccess";
+export * from "./useUpdateAccessPermission";

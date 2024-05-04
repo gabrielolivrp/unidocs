@@ -12,7 +12,7 @@ export type FileActionEvent =
 export interface Action {
   name: string;
   event: FileActionEvent;
-  permissions: Unidocs.Access[];
+  permissions: Unidocs.Permission[];
   owned?: boolean;
 }
 

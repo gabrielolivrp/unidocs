@@ -10,8 +10,8 @@ import {
   type UpdateFileNameProps,
   type DownloadFileProps,
   type ShareFileProps,
-  type RevokeAccessProps,
-  type AccessUpdateProps,
+  type RevokeFileAccessProps,
+  type UpdateAccessPermissionProps,
   useGetFiles,
   useStoreFile,
   useTransferFile,
@@ -20,8 +20,8 @@ import {
   useUpdateFileName,
   useDownloadFile,
   useShareFile,
-  useRevokeAccess,
-  useAccessUpdate,
+  useRevokeFileAccess,
+  useUpdateAccessPermission,
 } from "../hooks";
 
 type UnidocsContextProps = {
@@ -33,8 +33,8 @@ type UnidocsContextProps = {
   updateFileName: (props: UpdateFileNameProps) => any;
   downloadFile: (props: DownloadFileProps) => any;
   shareFile: (props: ShareFileProps) => any;
-  revokeAccess: (props: RevokeAccessProps) => any;
-  accessUpdate: (props: AccessUpdateProps) => any;
+  revokeFileAccess: (props: RevokeFileAccessProps) => any;
+  updateAccessPermission: (props: UpdateAccessPermissionProps) => any;
 };
 
 const UnidocsContext = createContext<UnidocsContextProps | null>(null);
@@ -53,8 +53,8 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
   const { updateFileName } = useUpdateFileName();
   const { downloadFile } = useDownloadFile();
   const { shareFile } = useShareFile();
-  const { revokeAccess } = useRevokeAccess();
-  const { accessUpdate } = useAccessUpdate();
+  const { revokeFileAccess } = useRevokeFileAccess();
+  const { updateAccessPermission } = useUpdateAccessPermission();
 
   const storeFile_ = (props: StoreFileProps) =>
     storeFile(props).then(async (result) => {
@@ -86,13 +86,13 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
       await refetch();
       return result;
     });
-  const revokeAccess_ = (props: RevokeAccessProps) =>
-    revokeAccess(props).then(async (result) => {
+  const revokeFileAccess_ = (props: RevokeFileAccessProps) =>
+    revokeFileAccess(props).then(async (result) => {
       await refetch();
       return result;
     });
-  const accessUpdate_ = (props: AccessUpdateProps) =>
-    accessUpdate(props).then(async (result) => {
+  const updateAccessPermission_ = (props: UpdateAccessPermissionProps) =>
+    updateAccessPermission(props).then(async (result) => {
       await refetch();
       return result;
     });
@@ -108,8 +108,8 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
         updateFileDescription: updateFileDescription_,
         updateFileName: updateFileName_,
         shareFile: shareFile_,
-        revokeAccess: revokeAccess_,
-        accessUpdate: accessUpdate_,
+        revokeFileAccess: revokeFileAccess_,
+        updateAccessPermission: updateAccessPermission_,
       }}
     >
       {children}

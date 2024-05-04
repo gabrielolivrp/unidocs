@@ -43,9 +43,9 @@ const ShareFileDialog = ({
 }: ShareFileDialogProps) => {
   const [account, setAccount] = useState("");
   const [formError, setFormError] = useState("");
-  const [accountAccess, setAccountAccess] =
-    useState<Unidocs.AccountAccess | null>(null);
-  const [access, setAccess] = useState<Unidocs.Access>("READ");
+  const [accessControl, setAccessControl] =
+    useState<Unidocs.AccessControl | null>(null);
+  const [permission, setPermission] = useState<Unidocs.Permission>("READ");
   const [accessUpdateModal, setAccessUpdateModal] = useState(false);
   const writeTx = useTransactor({
     onError: (err) => {
@@ -58,7 +58,7 @@ const ShareFileDialog = ({
     },
   });
   const { address } = useAccount();
-  const { shareFile, revokeAccess, accessUpdate } = useUnidocs();
+  const { shareFile, revokeFileAccess, updateAccessPermission } = useUnidocs();
 
   useEffect(() => setFormError(""), [account]);
 
@@ -68,7 +68,7 @@ const ShareFileDialog = ({
       return;
     }
 
-    if (!access) {
+    if (!permission) {
       setFormError("Permission is required");
       return;
     }
@@ -77,33 +77,33 @@ const ShareFileDialog = ({
       shareFile({
         fileId: file.fileId,
         account: account as Address,
-        access,
+        permission,
       })
     );
   };
 
-  const handleRemove = (accountPermission: Unidocs.AccountAccess) =>
+  const handleRemove = (accessControl: Unidocs.AccessControl) =>
     writeTx(() =>
-      revokeAccess({
+      revokeFileAccess({
         fileId: file.fileId,
-        account: accountPermission.account,
+        account: accessControl.account,
       })
     );
 
-  const handleOpenAccessUpdate = (accountPermission: Unidocs.AccountAccess) => {
+  const handleOpenAccessUpdate = (accessControl: Unidocs.AccessControl) => {
     setAccessUpdateModal(true);
-    setAccess(accountPermission.access);
-    setAccountAccess(accountPermission);
+    setPermission(accessControl.permission);
+    setAccessControl(accessControl);
   };
 
-  const handleAccessUpdate = () => {
-    if (!accountAccess) return;
+  const handleUpdateAccessPermission = () => {
+    if (!accessControl) return;
 
     return writeTx(() =>
-      accessUpdate({
+      updateAccessPermission({
         fileId: file.fileId,
-        account: accountAccess.account,
-        access,
+        ...accessControl,
+        permission,
       })
     );
   };
@@ -129,9 +129,9 @@ const ShareFileDialog = ({
                 <FormItem className="col-span-2">
                   <FormLabel>Permission</FormLabel>
                   <Select
-                    defaultValue={access}
+                    defaultValue={permission}
                     onValueChange={(value) =>
-                      setAccess(value as Unidocs.Access)
+                      setPermission(value as Unidocs.Permission)
                     }
                   >
                     <SelectTrigger className="">
@@ -145,7 +145,7 @@ const ShareFileDialog = ({
                 </FormItem>
                 <div className="flex items-end">
                   <Button
-                    disabled={!account || !access}
+                    disabled={!account || !permission}
                     variant="ghost"
                     size="icon"
                   >
@@ -163,38 +163,38 @@ const ShareFileDialog = ({
 
           <table className=" border-spacing-2">
             <tbody>
-              {file.permissions.map((accountPermission, index) => (
+              {file.accessControls.map((accessControl, index) => (
                 <tr key={index}>
                   <td>
                     <div className="flex items-center space-x-3">
                       <AccountAvatar
-                        address={accountPermission.account as Address}
+                        address={accessControl.account as Address}
                       />
-                      <Hash text={accountPermission.account as Address} />
+                      <Hash text={accessControl.account as Address} />
                     </div>
                   </td>
                   <td>
                     <Badge className="lowercase">
-                      {accountPermission.account === address
+                      {accessControl.account === address
                         ? "OWNER"
-                        : accountPermission.access}
+                        : accessControl.permission}
                     </Badge>
                   </td>
                   <td>
-                    {accountPermission.account !== address && (
+                    {accessControl.account !== address && (
                       <DropdownMenu>
                         <DropdownMenuTrigger>
                           <Icon name="MoreVertical"></Icon>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           <DropdownMenuItem
-                            onClick={() => handleRemove(accountPermission)}
+                            onClick={() => handleRemove(accessControl)}
                           >
                             Remove
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() =>
-                              handleOpenAccessUpdate(accountPermission)
+                              handleOpenAccessUpdate(accessControl)
                             }
                           >
                             Update Access
@@ -210,12 +210,12 @@ const ShareFileDialog = ({
         </DialogContent>
       </Dialog>
 
-      {accountAccess && (
+      {accessControl && (
         <Dialog open={accessUpdateModal} onOpenChange={setAccessUpdateModal}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                Update Access <Hash text={accountAccess.account} />
+                Update Access <Hash text={accessControl.account} />
               </DialogTitle>
             </DialogHeader>
 
@@ -223,8 +223,10 @@ const ShareFileDialog = ({
               <FormItem className="col-span-2">
                 <FormLabel>Permission</FormLabel>
                 <Select
-                  defaultValue={access}
-                  onValueChange={(value) => setAccess(value as Unidocs.Access)}
+                  defaultValue={permission}
+                  onValueChange={(value) =>
+                    setPermission(value as Unidocs.Permission)
+                  }
                 >
                   <SelectTrigger className="">
                     <SelectValue placeholder="..." />
@@ -245,7 +247,7 @@ const ShareFileDialog = ({
               >
                 Cancel
               </Button>
-              <Button onClick={handleAccessUpdate}>Confirm</Button>
+              <Button onClick={handleUpdateAccessPermission}>Confirm</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
