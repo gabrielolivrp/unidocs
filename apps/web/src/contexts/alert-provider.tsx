@@ -6,11 +6,10 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { AlertDialog } from "@/components/alert-dialog";
+import { Dialog, DialogContent } from "@unidocs/ui";
 
 export type AlertParams = {
-  variant: "success" | "error";
-  message: ReactNode;
+  body: ReactNode;
 };
 
 type AlertContextProps = (data: AlertParams) => void;
@@ -34,13 +33,11 @@ export const AlertProvider = ({ children }: AlertProviderProps) => {
     <AlertContext.Provider value={alert}>
       {children}
       {alertParams && (
-        <AlertDialog
-          open={open}
-          onOpenChange={setOpen}
-          variant={alertParams.variant}
-        >
-          {alertParams.message}
-        </AlertDialog>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="py-20 max-w-sm">
+            {alertParams.body}
+          </DialogContent>
+        </Dialog>
       )}
     </AlertContext.Provider>
   );

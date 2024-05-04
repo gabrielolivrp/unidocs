@@ -64,7 +64,7 @@ contract Unidocs {
   /// @dev Emitted when file is shared.
   event FileAccessShared(uint256 indexed fileId, address indexed owner, address indexed account, Permission permission);
 
-  /// @dev Emitted when file is revoked.
+  /// @dev Emitted when file access is revoked.
   event FileAccessRevoked(uint256 indexed fileId, address indexed owner, address indexed account);
 
   /// @dev Emitted when file access is updated.

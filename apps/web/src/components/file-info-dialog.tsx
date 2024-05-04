@@ -36,6 +36,16 @@ const FileInfoDialog = ({
   const [updateFileDescriptionDialog, setUpdateFileDescriptionDialog] =
     useState(false);
 
+  const handleUpdateFileNameDialog = () => {
+    setUpdateFileNameDialog(true);
+    onOpenChange(false);
+  };
+
+  const handleUpdateFileDescriptionDialog = () => {
+    setUpdateFileDescriptionDialog(true);
+    onOpenChange(false);
+  };
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -54,7 +64,7 @@ const FileInfoDialog = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => setUpdateFileNameDialog(true)}
+                      onClick={handleUpdateFileNameDialog}
                     >
                       <Icon size="1rem" name="Pen" />
                     </Button>
@@ -75,7 +85,11 @@ const FileInfoDialog = ({
                   </Typography>
                   <div className="flex items-center justify-center space-x-2">
                     <label>
-                    {file.owner === address ? "me" : <Hash text={file.owner} />}
+                      {file.owner === address ? (
+                        "me"
+                      ) : (
+                        <Hash text={file.owner} />
+                      )}
                     </label>
                     <AccountAvatar address={file.owner} />
                   </div>
@@ -120,7 +134,7 @@ const FileInfoDialog = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setUpdateFileDescriptionDialog(true)}
+                    onClick={handleUpdateFileDescriptionDialog}
                   >
                     <Icon size="1rem" name="Pen" />
                   </Button>

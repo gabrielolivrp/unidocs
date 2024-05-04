@@ -1,4 +1,5 @@
 const getWagmiError = (err: Error | any): string => {
+  console.error(err)
   if (err.details) {
     return err.details;
   } else if (err.shortMessage) {

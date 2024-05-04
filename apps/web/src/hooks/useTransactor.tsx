@@ -4,7 +4,7 @@ import { Hash } from "@/components/hash";
 import { useAlert, useLoading } from "@/contexts";
 import { getPublicClient } from "wagmi/actions";
 import { getWagmiError } from "@/helpers";
-import { Typography } from "@unidocs/ui";
+import { Icon, Typography } from "@unidocs/ui";
 import { Address, WriteContractReturnType } from "viem";
 import { wagmiConfig } from "@/config";
 
@@ -17,7 +17,7 @@ type UseTransactorParams = {
 
 type UseTransactor = (
   params: UseTransactorParams
-) => (tx: () => Promise<WriteContractReturnType>) => Promise<void>;
+) => (callback: () => Promise<WriteContractReturnType>) => Promise<void>;
 
 const useTransactor: UseTransactor = ({
   onError,
@@ -27,50 +27,57 @@ const useTransactor: UseTransactor = ({
 }) => {
   const alert = useAlert();
   const {
-    startLoading: startConfirmLoading,
-    finishLoading: finishConfirmLoading,
+    startLoading: startWaitingConfirm,
+    finishLoading: finishWaitingConfirm,
   } = useLoading({
-    message: "Confirming transaction",
+    title: "Waiting for confirmation",
+    body: (
+      <Typography as="p" variant="p" className="text-center">
+        Confirm this transaction in your wallet
+      </Typography>
+    ),
   });
-  const {
-    startLoading: startWaitingLoading,
-    finishLoading: finishWaitingLoading,
-  } = useLoading({
-    message: "Waiting for transaction to complete.",
-  });
-  return async (fn) => {
+
+  return async (callback) => {
     try {
       const client = getPublicClient(wagmiConfig);
       onStart && onStart();
 
-      startConfirmLoading();
-      const hash = await fn();
-      finishConfirmLoading();
-
-      startWaitingLoading();
-      const receipt = await client?.waitForTransactionReceipt({
-        hash,
-      });
-      finishWaitingLoading();
+      startWaitingConfirm();
+      const hash = await callback();
+      finishWaitingConfirm();
 
       alert({
-        variant: "success",
-        message: (
-          <SuccessAlert
-            contractAddress={receipt?.to}
-            txHash={receipt?.transactionHash}
-            gasUsed={receipt?.gasUsed}
-          />
+        body: (
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <Icon name="ArrowUpRightFromCircle" size="3.75rem" />
+            <Typography variant="h5" className="text-center">
+              Transaction Submitted
+            </Typography>
+          </div>
         ),
       });
 
-      onSuccess && onSuccess();
+      client
+        ?.waitForTransactionReceipt({
+          hash,
+        })
+        .then((receipt) => {
+          alert({
+            body: (
+              <SuccessAlert
+                contractAddress={receipt?.to}
+                txHash={receipt?.transactionHash}
+              />
+            ),
+          });
+
+          onSuccess && onSuccess();
+        });
     } catch (err) {
       onError && onError(getWagmiError(err));
-      finishConfirmLoading();
-      finishWaitingLoading();
+      finishWaitingConfirm();
     }
-
     onFinish && onFinish();
   };
 };
@@ -87,8 +94,11 @@ const SuccessAlert = ({
   gasUsed,
 }: SuccessAlertProps) => (
   <>
-    <div className="flex justify-center">
-      <Typography variant="h4">Sent successsfully</Typography>
+    <div className="flex flex-col items-center justify-center space-y-3">
+      <Icon name="CheckCircle" size="3.75rem" />
+      <Typography variant="h5" className="text-center">
+        Sent successsfully
+      </Typography>
     </div>
     <div className="bg-secondary rounded-lg p-1">
       <table className="table w-full">
