@@ -155,7 +155,7 @@ const FileVersionHistoryDialog = ({
             <DialogTitle>Version History</DialogTitle>
           </DialogHeader>
 
-          <div>
+          <div className="flex max-h-96 overflow-y-auto">
             {Object.entries(versionHistory).map(([key, data]) => (
               <div key={key}>
                 <div className="ps-2 my-2 first:mt-0">
