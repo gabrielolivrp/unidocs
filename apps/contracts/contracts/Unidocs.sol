@@ -175,11 +175,26 @@ contract Unidocs {
       revert Unauthorized(_owner);
     }
 
-    (uint256 fileIndex, File memory file) = _findFile(_fileId);
-    for (uint256 i = fileIndex; i < accountFiles[_owner].length - 1; i++) {
-      accountFiles[_owner][i] = accountFiles[_owner][i + 1];
+    File memory file = _removeFile(_fileId, _owner);
+    _removeAccessControl(_fileId, _owner);
+    _removeAccessibleFile(_fileId, _owner);
+
+    bool hasPermission = false;
+    for (uint256 i = 0; i < accessControls[_fileId].length; i++) {
+      if (accessControls[_fileId][i].account == _to && accessControls[_fileId][i].permission != Permission.WRITE) {
+        accessControls[_fileId][i].permission = Permission.WRITE;
+        hasPermission = true;
+      }
     }
-    accountFiles[_owner].pop();
+
+    if (!hasPermission) {
+      AccessControl memory _accessControl = AccessControl({
+        account: _to,
+        permission: Permission.WRITE
+      });
+      accessibleFiles[_to].push(_fileId);
+      accessControls[_fileId].push(_accessControl);
+    }
 
     file.owner = _to;
     fileAccount[_fileId] = _to;
@@ -196,6 +211,12 @@ contract Unidocs {
 
     if (fileAccount[_fileId] != _owner || _account == _owner) {
       revert Unauthorized(_owner);
+    }
+
+    for (uint256 i = 0; i < accessControls[_fileId].length; i++) {
+      if (accessControls[_fileId][i].account == _account) {
+        revert Unauthorized(_account);
+      }
     }
 
     AccessControl memory _accessControl = AccessControl({
@@ -218,17 +239,8 @@ contract Unidocs {
       revert Unauthorized(_owner);
     }
 
-    (uint256 accessControlIndex,) = _findAccessControl(_fileId, _account);
-    for (uint256 i = accessControlIndex; i < accessControls[_fileId].length - 1; i++) {
-      accessControls[_fileId][i] = accessControls[_fileId][i + 1];
-    }
-    accessControls[_fileId].pop();
-
-    (uint256 accessibleFileIndex, )= _findAccessibleFile(_fileId, _account);
-    for (uint256 j = accessibleFileIndex; j < accessibleFiles[_account].length - 1; j++) {
-      accessibleFiles[_account][j] = accessibleFiles[_account][j + 1];
-    }
-    accessibleFiles[_account].pop();
+    _removeAccessControl(_fileId, _account);
+    _removeAccessibleFile(_fileId, _account);
 
     emit FileAccessRevoked(_fileId, msg.sender, _account);
   }
@@ -291,5 +303,30 @@ contract Unidocs {
       }
     }
     revert Unauthorized(_account);
+  }
+
+  function _removeAccessControl(uint256 _fileId, address _account) private {
+    (uint256 index, ) = _findAccessControl(_fileId, _account);
+    for (uint256 i = index; i < accessControls[_fileId].length - 1; i++) {
+      accessControls[_fileId][i] = accessControls[_fileId][i + 1];
+    }
+    accessControls[_fileId].pop();
+  }
+
+  function _removeAccessibleFile(uint256 _fileId, address _account) private {
+    (uint256 index, ) = _findAccessibleFile(_fileId, _account);
+    for (uint256 i = index; i < accessibleFiles[_account].length - 1; i++) {
+      accessibleFiles[_account][i] = accessibleFiles[_account][i + 1];
+    }
+    accessibleFiles[_account].pop();
+  }
+
+  function _removeFile(uint256 _fileId, address _account) private returns (File memory) {
+    (uint256 index, File memory file) = _findFile(_fileId);
+    for (uint256 i = index; i < accountFiles[_account].length - 1; i++) {
+      accountFiles[_account][i] = accountFiles[_account][i + 1];
+    }
+    accountFiles[_account].pop();
+    return file;
   }
 }
