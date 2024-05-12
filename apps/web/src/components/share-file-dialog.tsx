@@ -73,6 +73,14 @@ const ShareFileDialog = ({
       return;
     }
 
+    const hasAccessControl = file.accessControls.find(
+      (a) => a.account === account
+    );
+    if (hasAccessControl) {
+      setFormError("The address already has permission");
+      return;
+    }
+
     return writeTx(() =>
       shareFile({
         fileId: file.fileId,
@@ -98,7 +106,6 @@ const ShareFileDialog = ({
 
   const handleUpdateAccessPermission = () => {
     if (!accessControl) return;
-
     return writeTx(() =>
       updateAccessPermission({
         fileId: file.fileId,
@@ -161,52 +168,52 @@ const ShareFileDialog = ({
             <FormMessage>{formError}</FormMessage>
           </div>
 
-          <table className=" border-spacing-2">
-            <tbody>
-              {file.accessControls.map((accessControl, index) => (
-                <tr key={index}>
-                  <td>
-                    <div className="flex items-center space-x-3">
-                      <AccountAvatar
-                        address={accessControl.account as Address}
-                      />
-                      <Hash text={accessControl.account as Address} />
-                    </div>
-                  </td>
-                  <td>
-                    <Badge className="lowercase">
-                      {accessControl.account === address
-                        ? "OWNER"
-                        : accessControl.permission}
-                    </Badge>
-                  </td>
-                  <td>
-                    {accessControl.account !== address && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Icon name="MoreVertical"></Icon>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            onClick={() => handleRemove(accessControl)}
-                          >
-                            Remove
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleOpenAccessUpdate(accessControl)
-                            }
-                          >
-                            Update Access
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="max-h-96 overflow-y-auto">
+            <table className="w-full table-auto">
+              <tbody className="w-full">
+                {file.accessControls.map((accessControl, index) => (
+                  <tr key={index} className="">
+                    <td className="pb-2">
+                      <div className="flex items-center space-x-3">
+                        <AccountAvatar address={accessControl.account} />
+                        <Hash text={accessControl.account} />
+                      </div>
+                    </td>
+                    <td className="pb-2">
+                      <Badge className="lowercase">
+                        {accessControl.account === address
+                          ? "OWNER"
+                          : accessControl.permission}
+                      </Badge>
+                    </td>
+                    <td className="pb-2">
+                      {accessControl.account !== address && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Icon name="MoreVertical"></Icon>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={() => handleRemove(accessControl)}
+                            >
+                              Remove
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleOpenAccessUpdate(accessControl)
+                              }
+                            >
+                              Update Access
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </DialogContent>
       </Dialog>
 
