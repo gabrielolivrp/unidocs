@@ -8,14 +8,14 @@ export interface UpdateFileProps {
   nodeFile: File;
 }
 
-const useUpdateFile = () => {
+const useUpdateFile = (ipfsURL: string) => {
   const { updateVersion } = useUpdateFileVersion();
 
   const updateFile = async ({ file, nodeFile }: UpdateFileProps) => {
     const mimetype = nodeFile.type;
     const filesize = BigInt(nodeFile.size);
     const checksum = await generateChecksum(nodeFile);
-    const ipfs = await storeFile(nodeFile);
+    const ipfs = await storeFile(ipfsURL, nodeFile);
     return updateVersion({
       fileId: file.fileId,
       filename: file.currentVersion.filename,

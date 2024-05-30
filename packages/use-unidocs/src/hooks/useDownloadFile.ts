@@ -6,9 +6,12 @@ export interface DownloadFileProps {
   file: Unidocs.File;
 }
 
-const useDownloadFile = () => {
+const useDownloadFile = (ipfsURL: string) => {
   const downloadFile = async ({ file }: DownloadFileProps) => {
-    const base64 = await createFileFromChunks(file.currentVersion.ipfs);
+    const base64 = await createFileFromChunks(
+      ipfsURL,
+      file.currentVersion.ipfs
+    );
     saveAs(
       fromBase64(
         base64,

@@ -1,8 +1,8 @@
-import * as ipfs from "../lib/ipfs";
+import ipfs from "../lib/ipfs";
 
-const getChunks = async (ipfshashs: string[]) => {
+const getChunks = async (ipfsURL: string, ipfshashs: string[]) => {
   const chunks = [];
-  const data = await ipfs.get(ipfshashs);
+  const data = await ipfs(ipfsURL).get(ipfshashs);
 
   // TODO: estourar um erro?
   if (!data || !Object.keys(data).length) return [];
@@ -16,8 +16,8 @@ const getChunks = async (ipfshashs: string[]) => {
   return chunks;
 };
 
-const createFileFromChunks = async (ipfshashs: string[]) => {
-  return getChunks(ipfshashs).then((chunks) => chunks.join(""));
+const createFileFromChunks = (ipfsURL: string, ipfshashs: string[]) => {
+  return getChunks(ipfsURL, ipfshashs).then((chunks) => chunks.join(""));
 };
 
 export { createFileFromChunks };

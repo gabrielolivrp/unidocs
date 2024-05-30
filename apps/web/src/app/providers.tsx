@@ -6,6 +6,8 @@ import { UnidocsProvider } from "@unidocs/use-unidocs";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
+const IPFS_API = process.env.IPFS_API || "http://localhost:3005/api";
+
 export const Providers = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider
     attribute="class"
@@ -16,9 +18,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => (
     <Progress />
     <LoadingProvider>
       <AlertProvider>
-        <UnidocsProvider>
-          {children}
-        </UnidocsProvider>
+        <UnidocsProvider ipfs={IPFS_API}>{children}</UnidocsProvider>
       </AlertProvider>
     </LoadingProvider>
     <Toaster />

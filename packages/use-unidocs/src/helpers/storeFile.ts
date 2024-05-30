@@ -1,7 +1,10 @@
 import { toBase64 } from "./toBase64";
-import * as ipfs from "../lib/ipfs";
+import ipfs from "../lib/ipfs";
 
-const storeChunks = async (chunks: string[]) => {
+const storeChunks = async (
+  ipfsURL: string,
+  chunks: string[]
+): Promise<string[]> => {
   const data: Record<string, string> = {};
 
   let index = 0;
@@ -9,7 +12,7 @@ const storeChunks = async (chunks: string[]) => {
     data[index.toString()] = chunk;
     index += 1;
   }
-  const ipfshashs = await ipfs.storage(data);
+  const ipfshashs = await ipfs(ipfsURL).storage(data);
   return Object.values(ipfshashs ?? {});
 };
 
@@ -22,10 +25,10 @@ const createChunks = async (base64: string): Promise<string[]> => {
   return chunks;
 };
 
-const storeFile = async (file: File) => {
+const storeFile = async (ipfsURL: string, file: File) => {
   const base64 = await toBase64(file);
   const chunks = await createChunks(base64);
-  const ipfsHashs = await storeChunks(chunks);
+  const ipfsHashs = await storeChunks(ipfsURL, chunks);
 
   if (!ipfsHashs.length) {
     throw new Error("An error occurred when trying to upload to ipfs");

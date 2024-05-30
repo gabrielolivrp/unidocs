@@ -9,7 +9,7 @@ export interface StoreFileProps {
   description: string;
 }
 
-const useStoreFile = () => {
+const useStoreFile = (ipfsURL: string) => {
   const unidocs = getContract("Unidocs");
   const { writeContractAsync } = useWriteContract();
 
@@ -21,7 +21,7 @@ const useStoreFile = () => {
     const mimetype = file.type;
     const filesize = BigInt(file.size);
     const checksum = await generateChecksum(file);
-    const ipfs = await storeFile(file);
+    const ipfs = await storeFile(ipfsURL, file);
     const createdAt = BigInt(Date.now());
     return writeContractAsync({
       ...unidocs,

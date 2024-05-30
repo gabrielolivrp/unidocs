@@ -26,6 +26,7 @@ import {
 
 type UnidocsContextProps = {
   files: Unidocs.File[];
+  ipfs: string;
   storeFile: (props: StoreFileProps) => any;
   updateFile: (props: UpdateFileProps) => any;
   transferFile: (props: TransferFileProps) => any;
@@ -41,17 +42,18 @@ const UnidocsContext = createContext<UnidocsContextProps | null>(null);
 
 interface UnidocsProviderProps {
   children: ReactNode;
+  ipfs: string;
 }
 
-export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
+export const UnidocsProvider = ({ ipfs, children }: UnidocsProviderProps) => {
   const { address } = useAccount();
   const { files, refetch } = useGetFiles({ account: address! });
-  const { storeFile } = useStoreFile();
-  const { updateFile } = useUpdateFile();
+  const { storeFile } = useStoreFile(ipfs);
+  const { updateFile } = useUpdateFile(ipfs);
   const { transferFile } = useTransferFile();
   const { updateFileDescription } = useUpdateFileDescription();
   const { updateFileName } = useUpdateFileName();
-  const { downloadFile } = useDownloadFile();
+  const { downloadFile } = useDownloadFile(ipfs);
   const { shareFile } = useShareFile();
   const { revokeFileAccess } = useRevokeFileAccess();
   const { updateAccessPermission } = useUpdateAccessPermission();
@@ -100,6 +102,7 @@ export const UnidocsProvider = ({ children }: UnidocsProviderProps) => {
   return (
     <UnidocsContext.Provider
       value={{
+        ipfs,
         files,
         downloadFile,
         storeFile: storeFile_,
