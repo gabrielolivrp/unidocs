@@ -19,6 +19,7 @@
     "contracts:test": {},
     "contracts:chain": {},
     "contracts:deploy": {},
+    "contracts:testnet": {},
     "contracts:compile": {}
   }
 }

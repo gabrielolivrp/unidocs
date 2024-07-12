@@ -7,7 +7,8 @@
     "contracts:clean": "npx hardhat clean",
     "contracts:chain": "npx hardhat node",
     "contracts:compile": "npx clean && npx hardhat compile",
-    "contracts:deploy": "npx hardhat run scripts/deploy.ts --network localhost"
+    "contracts:deploy": "npx hardhat run scripts/deploy.ts --network localhost",
+    "contracts:testnet": "npx hardhat run scripts/deploy.ts --network sepolia"
   },
   "devDependencies": {
     "@unidocs/tsconfig": "*",

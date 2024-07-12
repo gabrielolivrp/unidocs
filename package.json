@@ -11,6 +11,7 @@
     "dev": "npx turbo run dev --no-cache --parallel",
     "contracts:test": "npx turbo run contracts:test --filter=contracts",
     "contracts:deploy": "npx turbo run contracts:deploy --filter=contracts",
+    "contracts:testnet": "npx turbo run contracts:testnet --filter=contracts",
     "contracts:compile": "npx turbo run contracts:compile --filter=contracts",
     "contracts:chain": "npx turbo run contracts:chain --filter=contracts"
   },
