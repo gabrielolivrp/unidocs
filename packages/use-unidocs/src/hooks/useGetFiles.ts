@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useReadContract } from "wagmi";
 import { Address } from "viem";
-import { getContract } from "../helpers/getContracts";
-import { fromPermission, toPermission, Unidocs } from "../types";
+import { getContract } from "../helpers";
+import { toPermission, Unidocs } from "../types";
 
 interface useGetFilesProps {
   account: Address;

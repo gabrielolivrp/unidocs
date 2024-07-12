@@ -1,6 +1,5 @@
 import { useUpdateFileVersion } from "./useUpdateFileVersion";
-import { generateChecksum } from "../helpers";
-import { storeFile } from "../helpers/storeFile";
+import { storeFile, generateChecksum } from "../helpers";
 import { Unidocs } from "../types";
 
 export interface UpdateFileProps {

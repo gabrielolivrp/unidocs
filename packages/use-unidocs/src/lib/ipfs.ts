@@ -20,7 +20,7 @@ const ipfs = (baseURL: string) => {
   const get = async (
     cids: string[]
   ): Promise<
-    { [key: string]: { index: string; chunk: string } } | undefined
+    { [key: string]: { part: string; chunk: string } } | undefined
   > => {
     try {
       const { data } = await base.post("/get", {

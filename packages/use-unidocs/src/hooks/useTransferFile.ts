@@ -1,6 +1,6 @@
 import { useWriteContract } from "wagmi";
 import { Address } from "viem";
-import { getContract } from "../helpers/getContracts";
+import { getContract } from "../helpers";
 import { Unidocs } from "../types";
 
 export interface TransferFileProps {

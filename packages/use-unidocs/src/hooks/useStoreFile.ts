@@ -1,7 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { getContract } from "../helpers/getContracts";
-import { generateChecksum } from "../helpers/generateChecksum";
-import { storeFile } from "../helpers/storeFile";
+import { getContract, generateChecksum, storeFile } from "../helpers";
 
 export interface StoreFileProps {
   file: File;

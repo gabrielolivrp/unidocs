@@ -1,5 +1,5 @@
 import { saveAs } from "file-saver";
-import { fromBase64, createFileFromChunks } from "../helpers";
+import { getFile } from "../helpers";
 import { Unidocs } from "../types";
 
 export interface DownloadFileProps {
@@ -8,17 +8,16 @@ export interface DownloadFileProps {
 
 const useDownloadFile = (ipfsURL: string) => {
   const downloadFile = async ({ file }: DownloadFileProps) => {
-    const base64 = await createFileFromChunks(
+    const { currentVersion: version } = file;
+    const file_ = await getFile(
       ipfsURL,
-      file.currentVersion.ipfs
+      version.ipfs,
+      version.filename,
+      version.mimetype
     );
-    saveAs(
-      fromBase64(
-        base64,
-        file.currentVersion.filename,
-        file.currentVersion.mimetype
-      )
-    );
+    if (file_) {
+      saveAs(file_);
+    }
   };
 
   return { downloadFile };

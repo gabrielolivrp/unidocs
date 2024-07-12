@@ -1,5 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { getContract } from "../helpers/getContracts";
+import { getContract } from "../helpers";
 
 interface UpdateFileVersionProps {
   fileId: bigint;
