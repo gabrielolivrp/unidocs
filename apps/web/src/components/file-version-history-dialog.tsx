@@ -157,7 +157,7 @@ const FileVersionHistoryDialog = ({
 
           <div className="flex max-h-96 overflow-y-auto">
             {Object.entries(versionHistory).map(([key, data]) => (
-              <div key={key}>
+              <div key={key} className="w-full">
                 <div className="ps-2 my-2 first:mt-0">
                   <Typography as="h3" variant="mutedText">
                     {key}

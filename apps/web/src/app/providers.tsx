@@ -6,7 +6,7 @@ import { UnidocsProvider } from "@unidocs/use-unidocs";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
-const IPFS_API = process.env.IPFS_API || "http://localhost:3005/api";
+const IPFS_API = process.env.NEXT_PUBLIC_IPFS_API || "http://localhost:3005/api";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider

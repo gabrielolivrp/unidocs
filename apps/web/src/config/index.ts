@@ -1,6 +1,6 @@
-import { cookieStorage, createConfig, createStorage, http } from "wagmi";
+import { cookieStorage, createStorage } from "wagmi";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-import { hardhat } from "wagmi/chains";
+import { hardhat, sepolia } from "wagmi/chains";
 
 const metadata = {
   name: "Unidocs",
@@ -15,10 +15,10 @@ if (!process.env.NEXT_PUBLIC_PROJECT_ID) {
 
 export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string;
 
-export const defaultChain = hardhat;
+export const defaultChain = sepolia;
 
 export const wagmiConfig = defaultWagmiConfig({
-  chains: [defaultChain],
+  chains: [defaultChain, hardhat],
   projectId,
   metadata,
   ssr: true,
@@ -30,5 +30,3 @@ export const wagmiConfig = defaultWagmiConfig({
   enableEIP6963: true,
   enableCoinbase: true,
 });
-
-// wagmiConfig.
