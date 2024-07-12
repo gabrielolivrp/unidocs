@@ -54,8 +54,8 @@ const Tr = React.forwardRef<
 >(({ ...props }, ref) => <tr ref={ref} {...props} />);
 
 const Td = React.forwardRef<
-  HTMLTableColElement,
-  React.TdHTMLAttributes<HTMLTableColElement>
+  HTMLTableDataCellElement,
+  React.TdHTMLAttributes<HTMLTableDataCellElement>
 >(({ className, ...props }, ref) => (
   <td ref={ref} className={cn("p-4 align-middle ", className)} {...props} />
 ));
