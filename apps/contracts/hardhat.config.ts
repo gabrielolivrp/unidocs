@@ -4,16 +4,8 @@ dotEnvConfig();
 import { HardhatUserConfig, vars } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
-const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
-
-if (!ALCHEMY_API_KEY) {
-  throw new Error("ALCHEMY_API_KEY");
-}
-
-if (!DEPLOYER_PRIVATE_KEY) {
-  throw new Error("DEPLOYER_PRIVATE_KEY");
-}
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || "";
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
 
 const config: HardhatUserConfig = {
   solidity: {
