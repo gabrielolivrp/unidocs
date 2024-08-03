@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "contracts:test": "npx hardhat test",
+    "contracts:test": "npx hardhat test --network localhost",
     "contracts:clean": "npx hardhat clean",
     "contracts:chain": "npx hardhat node",
     "contracts:compile": "npx clean && npx hardhat compile",
