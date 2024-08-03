@@ -1,7 +1,7 @@
 import { config as dotEnvConfig } from "dotenv";
 dotEnvConfig();
 
-import { HardhatUserConfig, vars } from "hardhat/config";
+import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || "";
