@@ -26,7 +26,7 @@ const generateChecksum = async (file: File): Promise<string> => {
 
   moveCursor(0);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     reader.onloadend = function () {
       resolve(hash.digest("hex"));
     };
