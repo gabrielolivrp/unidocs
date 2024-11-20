@@ -101,7 +101,7 @@ const Files = ({ layout }: FilesProps) => {
   return (
     <div className="space-y-4">
       {layout === "grid" && files.length > 0 && (
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-6 gap-4 sm:grid-cols-4">
           {files?.map((file, index) => (
             <FileCard key={index} onAction={onAction(file)} file={file} />
           ))}

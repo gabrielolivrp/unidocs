@@ -43,7 +43,7 @@ const UpdateFileNameDialog = ({
 
   const onSubmit = () => {
     if (!filename || filename === file.currentVersion.filename) {
-      setFormError("File name is required");
+      setFormError("Filename is required");
       return;
     }
     return writeTx(() =>
@@ -58,7 +58,7 @@ const UpdateFileNameDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update file name</DialogTitle>
+          <DialogTitle>Update Filename</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
