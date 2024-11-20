@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prestart": "npm install",
     "start": "node index.js",
     "dev": "nodemon --exec node index.js"
   },
