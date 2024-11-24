@@ -83,6 +83,10 @@ app.post("/api/get", async (req, res) => {
   }
 });
 
+app.get("/api/healthcheck", (_, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.listen(port, () =>
   console.log(`ipfs is running at http://localhost:${port}`)
 );
